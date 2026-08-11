@@ -1,19 +1,25 @@
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import AppLayout from "../components/AppLayout";
 
 /**
  * 로그인 후 진입하는 임시 홈 화면.
- * 공지/과제 목록 화면이 만들어지기 전까지의 placeholder.
  */
 function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div style={{ padding: 32 }}>
-      <h1>안녕하세요, {user?.name}님</h1>
-      <p>학번: {user?.studentNumber}</p>
-      <p>역할: {user?.role}</p>
-      <button onClick={logout}>로그아웃</button>
-    </div>
+    <AppLayout>
+      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#1a1d29" }}>
+        안녕하세요, {user?.name}님
+      </h1>
+      <p style={{ fontSize: 13, color: "#6b7280", marginTop: 6 }}>
+        학번 {user?.studentNumber} · {user?.role}
+      </p>
+      <p style={{ marginTop: 20 }}>
+        <Link to="/notices">공지사항 보러가기</Link>
+      </p>
+    </AppLayout>
   );
 }
 
