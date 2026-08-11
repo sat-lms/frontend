@@ -1,0 +1,135 @@
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 2fr 8fr;
+}
+
+.auth-page__form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 360px;
+  padding: 8px 0;
+}
+
+/* 브랜드 패널은 화면이 좁아지면 숨기고 폼만 전체 폭으로 보여준다 */
+@media (max-width: 860px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1d29;
+  margin: 0 0 4px;
+}
+
+.auth-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 24px;
+}
+
+.form-field {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-field input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.form-field input:focus {
+  border-color: #002968;
+  box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
+}
+
+.form-field input[aria-invalid="true"] {
+  border-color: #dc2626;
+}
+
+.field-error {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.submit-error {
+  font-size: 13px;
+  color: #dc2626;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 4px 0 16px;
+}
+
+.info-banner {
+  font-size: 13px;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+}
+
+.auth-submit {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: #002968;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: #001d4d;
+}
+
+.auth-submit:disabled {
+  background: #7b8bab;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.auth-switch a {
+  color: #002968;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}

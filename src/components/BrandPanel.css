@@ -1,0 +1,64 @@
+.brand-panel {
+  position: relative;
+  overflow: hidden;
+  background: #002968; /* Myongji Dark Blue */
+  color: #ffffff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+}
+
+.brand-panel__watermark {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 260px;
+  height: 260px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.16;
+  pointer-events: none;
+}
+.brand-panel__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #002968;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.brand-panel__footer {
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+/* 모바일에서는 왼쪽 패널을 상단 배너 형태로 축소 */
+@media (max-width: 860px) {
+  .brand-panel {
+    min-height: auto;
+    padding: 28px 24px;
+  }
+
+  .brand-panel__watermark {
+    width: 220px;
+    height: 220px;
+  }
+}
