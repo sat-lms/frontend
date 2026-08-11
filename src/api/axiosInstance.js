@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // 세션 방식이면 true 유지, 순수 토큰 방식이면 false로 변경
+  // JWT(Access Token) 단독 방식으로 확정 — 쿠키 세션을 안 쓰므로 withCredentials 불필요
 });
 
 // 로그인 후 저장된 accessToken을 매 요청에 자동으로 실어 보낸다.

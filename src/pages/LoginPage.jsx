@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { login } from "../api/authApi";
+import { login as loginApi } from "../api/authApi";
 import { getLoginErrors } from "../utils/validators";
+import { useAuth } from "../context/AuthContext";
 import BrandPanel from "../components/BrandPanel";
 import "./AuthPage.css";
 
@@ -17,6 +18,7 @@ const STATUS_MESSAGE = {
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { login: setAuthUser } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -42,12 +44,20 @@ function LoginPage() {
 
     setIsSubmitting(true);
     try {
-      const data = await login(form);
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("memberId", data.memberId);
-      localStorage.setItem("role", data.role);
+      const data = await loginApi(form);
 
-      navigate(data.role === "ADMIN" ? "/admin" : "/");
+      // AuthContext에 로그인 상태 반영 (localStorage 저장은 context 내부에서 처리)
+      setAuthUser(data.accessToken, {
+        memberId: data.memberId,
+        name: data.name,
+        role: data.role,
+        status: data.status,
+      });
+
+      // ProtectedRoute가 "원래 가려던 경로"를 state.from으로 넘겨줬으면 그쪽으로,
+      // 아니면 role 기준으로 기본 진입 화면으로 이동
+      const redirectTo = location.state?.from ?? (data.role === "ADMIN" ? "/admin" : "/");
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       if (err.status === 401) {
         setSubmitError("학번 또는 비밀번호가 일치하지 않습니다.");

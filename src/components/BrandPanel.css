@@ -17,10 +17,12 @@
   width: 260px;
   height: 260px;
   object-fit: contain;
+  /* 원본 로고(짙은 남색)를 흰색 워터마크로 표현 */
   filter: brightness(0) invert(1);
   opacity: 0.16;
   pointer-events: none;
 }
+
 .brand-panel__header {
   position: relative;
   z-index: 1;
@@ -50,6 +52,7 @@
   color: rgba(255, 255, 255, 0.55);
   margin: 0;
 }
+
 /* 모바일에서는 왼쪽 패널을 상단 배너 형태로 축소 */
 @media (max-width: 860px) {
   .brand-panel {
