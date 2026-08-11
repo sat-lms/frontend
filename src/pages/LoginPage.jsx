@@ -56,7 +56,7 @@ function LoginPage() {
 
       // ProtectedRoute가 "원래 가려던 경로"를 state.from으로 넘겨줬으면 그쪽으로,
       // 아니면 role 기준으로 기본 진입 화면으로 이동
-      const redirectTo = location.state?.from ?? (data.role === "ADMIN" ? "/admin" : "/");
+      const redirectTo = location.state?.from ?? (data.role === "ADMIN" ? "/admin/approvals" : "/");
       navigate(redirectTo, { replace: true });
     } catch (err) {
       if (err.status === 401) {

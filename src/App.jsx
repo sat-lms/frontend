@@ -4,7 +4,11 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import AdminPage from "./pages/AdminPage";
+import NoticeListPage from "./pages/NoticeListPage";
+import NoticeDetailPage from "./pages/NoticeDetailPage";
+import AssignmentListPage from "./pages/AssignmentListPage";
+import AdminApprovalsPage from "./pages/AdminApprovalsPage";
+import AdminSubmissionsPage from "./pages/AdminSubmissionsPage";
 
 function App() {
   return (
@@ -14,7 +18,6 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* TODO: 공지/과제 목록 등 실제 화면이 만들어지면 DashboardPage 자리를 대체 */}
           <Route
             path="/"
             element={
@@ -24,10 +27,43 @@ function App() {
             }
           />
           <Route
-            path="/admin"
+            path="/notices"
+            element={
+              <ProtectedRoute>
+                <NoticeListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notices/:noticeId"
+            element={
+              <ProtectedRoute>
+                <NoticeDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assignments"
+            element={
+              <ProtectedRoute>
+                <AssignmentListPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/approvals"
             element={
               <ProtectedRoute role="ADMIN">
-                <AdminPage />
+                <AdminApprovalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/submissions"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AdminSubmissionsPage />
               </ProtectedRoute>
             }
           />
