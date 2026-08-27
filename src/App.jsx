@@ -7,6 +7,7 @@ import DashboardPage from "./pages/DashboardPage";
 import NoticeListPage from "./pages/NoticeListPage";
 import NoticeDetailPage from "./pages/NoticeDetailPage";
 import AssignmentListPage from "./pages/AssignmentListPage";
+import AssignmentDetailPage from "./pages/AssignmentDetailPage";
 import AdminApprovalsPage from "./pages/AdminApprovalsPage";
 import AdminSubmissionsPage from "./pages/AdminSubmissionsPage";
 
@@ -47,6 +48,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AssignmentListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assignments/:assignmentId"
+            element={
+              <ProtectedRoute>
+                <AssignmentDetailPage />
               </ProtectedRoute>
             }
           />

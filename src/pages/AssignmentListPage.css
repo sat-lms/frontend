@@ -1,0 +1,134 @@
+.assignment-page__header {
+  margin-bottom: 32px;
+}
+
+.assignment-page__title {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.374px;
+  line-height: 1.2;
+  color: #1d1d1f;
+  margin: 0 0 8px;
+}
+
+.assignment-page__subtitle {
+  font-size: 17px;
+  color: #7a7a7a;
+  margin: 0;
+}
+
+.assignment-page__state {
+  padding: 48px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.assignment-page__state--error {
+  color: #c23b3b;
+}
+
+.assignment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.assignment-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.assignment-item:hover {
+  background: #f5f5f7;
+}
+
+.assignment-item__main {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assignment-item__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.assignment-item__due {
+  font-size: 14px;
+  color: #7a7a7a;
+  letter-spacing: -0.224px;
+}
+
+.assignment-item__status {
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.224px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+.assignment-item__status.is-progress {
+  background: #eef2f8;
+  color: #002968;
+}
+
+.assignment-item__status.is-submitted {
+  background: #e7f7ee;
+  color: #1f9254;
+}
+
+.assignment-item__status.is-late {
+  background: #fff3e0;
+  color: #c97a1d;
+}
+
+.assignment-item__status.is-closed {
+  background: #fdebec;
+  color: #c23b3b;
+}
+
+.assignment-item__status.is-default {
+  background: #f0f0f0;
+  color: #7a7a7a;
+}
+
+.assignment-page__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #7a7a7a;
+}
+
+.assignment-page__pagination button {
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.assignment-page__pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -10,10 +10,8 @@ function DashboardPage() {
 
   return (
     <AppLayout>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: "#1a1d29" }}>
-        안녕하세요, {user?.name}님
-      </h1>
-      <p style={{ fontSize: 13, color: "#6b7280", marginTop: 6 }}>
+      <h1 className="page-title">안녕하세요, {user?.name}님</h1>
+      <p className="page-subtitle">
         학번 {user?.studentNumber} · {user?.role}
       </p>
       <p style={{ marginTop: 20 }}>
