@@ -7,6 +7,9 @@ import "./NoticeListPage.css";
 import "./AdminWritePage.css";
 
 const PAGE_SIZE = 10;
+// 검색 중에는 서버 페이지네이션 대신 넉넉히 한 번에 가져와 제목 기준으로 클라이언트에서 필터링한다
+// (백엔드 GET /api/v1/notices에 검색어 파라미터가 없어서 클라이언트 검색으로 처리).
+const SEARCH_FETCH_SIZE = 200;
 
 function NoticeListPage() {
   const { user } = useAuth();
@@ -19,10 +22,32 @@ function NoticeListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // 타이핑할 때마다 요청을 보내지 않도록 300ms 디바운스 후 실제 검색어로 반영한다.
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchTerm(searchInput.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm, unreadOnly]);
+
   const fetchNotices = useCallback(async () => {
     setIsLoading(true);
     setError("");
     try {
+      if (searchTerm) {
+        const data = await getNotices({ page: 0, size: SEARCH_FETCH_SIZE, unreadOnly });
+        const list = Array.isArray(data) ? data : data.content ?? [];
+        const keyword = searchTerm.toLowerCase();
+        setNotices(list.filter((n) => n.title?.toLowerCase().includes(keyword)));
+        setTotalPages(1);
+        return;
+      }
+
       const data = await getNotices({ page, size: PAGE_SIZE, unreadOnly });
       // 명세서상 응답 형태가 페이지네이션 객체(content/totalPages)인지
       // 배열 단독인지 백엔드와 확정되지 않아, 둘 다 방어적으로 처리한다.
@@ -38,7 +63,7 @@ function NoticeListPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, unreadOnly]);
+  }, [page, unreadOnly, searchTerm]);
 
   const fetchUnreadCount = useCallback(async () => {
     try {
@@ -58,31 +83,54 @@ function NoticeListPage() {
   }, [fetchUnreadCount]);
 
   const handleToggleUnreadOnly = () => {
-    setPage(0);
     setUnreadOnly((prev) => !prev);
   };
+
+  const subtitle = searchTerm
+    ? `'${searchTerm}' 검색 결과 ${notices.length}건`
+    : `학과 및 시스템 공지를 확인하세요${unreadCount > 0 ? ` · 안 읽은 공지 ${unreadCount}건` : ""}`;
+
+  const emptyMessage = searchTerm
+    ? "검색 결과가 없습니다."
+    : unreadOnly
+    ? "안 읽은 공지가 없습니다."
+    : "등록된 공지가 없습니다.";
 
   return (
     <AppLayout>
       <div className="notice-page__header">
         <div>
           <h1 className="notice-page__title">공지사항</h1>
-          <p className="notice-page__subtitle">
-            학과 및 시스템 공지를 확인하세요
-            {unreadCount > 0 && ` · 안 읽은 공지 ${unreadCount}건`}
-          </p>
+          <p className="notice-page__subtitle">{subtitle}</p>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12 }}>
-          {isAdmin && (
-            <Link to="/admin/notices/new" className="page-header-add-btn">
-              + 새 공지 작성
-            </Link>
-          )}
-          <label className="notice-page__filter">
-            <input type="checkbox" checked={unreadOnly} onChange={handleToggleUnreadOnly} />
-            안 읽은 공지만
-          </label>
+        {isAdmin && (
+          <Link to="/admin/notices/new" className="page-header-add-btn">
+            + 새 공지 작성
+          </Link>
+        )}
+      </div>
+
+      <div className="list-toolbar">
+        <label className="notice-page__filter">
+          <input type="checkbox" checked={unreadOnly} onChange={handleToggleUnreadOnly} />
+          안 읽은 공지만
+        </label>
+
+        <div className="list-search">
+          <span className="list-search__icon" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+              <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            className="list-search__input"
+            placeholder="공지 제목으로 검색"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
         </div>
       </div>
 
@@ -93,9 +141,7 @@ function NoticeListPage() {
       )}
 
       {!isLoading && !error && notices.length === 0 && (
-        <p className="notice-page__state">
-          {unreadOnly ? "안 읽은 공지가 없습니다." : "등록된 공지가 없습니다."}
-        </p>
+        <p className="notice-page__state">{emptyMessage}</p>
       )}
 
       {!isLoading && !error && notices.length > 0 && (
@@ -114,7 +160,7 @@ function NoticeListPage() {
         </ul>
       )}
 
-      {!isLoading && !error && totalPages > 1 && (
+      {!isLoading && !error && !searchTerm && totalPages > 1 && (
         <div className="notice-page__pagination">
           <button disabled={page === 0} onClick={() => setPage((prev) => prev - 1)}>
             이전

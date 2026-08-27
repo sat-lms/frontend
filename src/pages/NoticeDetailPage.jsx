@@ -61,7 +61,10 @@ function NoticeDetailPage() {
       {!isLoading && !error && notice && (
         <article className="notice-detail">
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-            <h1 className="notice-detail__title">{notice.title}</h1>
+            <div>
+              {notice.isPinned && <span className="notice-detail__badge">고정 공지</span>}
+              <h1 className="notice-detail__title">{notice.title}</h1>
+            </div>
             {isAdmin && (
               <div className="admin-detail-actions">
                 <Link to={`/admin/notices/${noticeId}/edit`} className="admin-detail-actions__btn">

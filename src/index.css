@@ -8,6 +8,112 @@ body {
   padding: 0;
 }
 
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Pretendard",
+    "Malgun Gothic", sans-serif;
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.374px;
+  color: #1d1d1f;
+  background: #f5f5f7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #002968;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}
+
 #root {
   min-height: 100vh;
+}
+
+/*
+ * SAT-LMS 프로토타입(Claude Design 목업) 기준 공통 페이지 헤딩/빈 상태 스타일.
+ * 개별 페이지 CSS가 없는 화면(대시보드, 관리자 placeholder)에서 재사용한다.
+ */
+.page-title {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.374px;
+  line-height: 1.2;
+  color: #1d1d1f;
+  margin: 0 0 8px;
+}
+
+.page-subtitle {
+  font-size: 17px;
+  color: #7a7a7a;
+  margin: 0;
+}
+
+.page-empty-card {
+  margin-top: 24px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/*
+ * 목록 화면(공지/과제) 상단 검색창. 명지대 LMS 목록 화면의 검색창 레이아웃을 참고했다
+ * (색상/모양은 SAT-LMS 네이비 브랜드 톤 그대로).
+ */
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.list-search {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 280px;
+}
+
+.list-search__icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+}
+
+.list-search__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px 10px 36px;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #ffffff;
+  outline: none;
+}
+
+.list-search__input:focus {
+  border-color: #002968;
+  box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
+}
+
+.list-search__input::placeholder {
+  color: #9ca3af;
 }
