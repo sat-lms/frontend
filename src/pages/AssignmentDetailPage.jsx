@@ -45,9 +45,11 @@ function AssignmentDetailPage() {
     setIsLoading(true);
     setError("");
     try {
+      // 제출물 조회(GET .../submission)는 백엔드가 학생 전용으로 제한한다(requireStudent).
+      // 관리자 계정으로 호출하면 403이 나므로, 관리자일 때는 아예 호출하지 않는다.
       const [assignmentData, submissionData] = await Promise.all([
         getAssignmentDetail(assignmentId),
-        getMySubmission(assignmentId),
+        isAdmin ? Promise.resolve(null) : getMySubmission(assignmentId),
       ]);
       setAssignment(assignmentData);
       setSubmission(submissionData);
@@ -56,7 +58,7 @@ function AssignmentDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [assignmentId]);
+  }, [assignmentId, isAdmin]);
 
   useEffect(() => {
     fetchAll();
@@ -70,8 +72,9 @@ function AssignmentDetailPage() {
   const canModify = !assignment || assignment.allowLateSubmission || !isPastDue;
   const isClosed = !canModify;
 
-  const showReceipt = hasSubmission && !editing;
-  const showForm = canModify && (!hasSubmission || editing);
+  // 관리자는 제출자가 아니므로 학생용 제출 내역/제출 폼을 아예 보여주지 않는다.
+  const showReceipt = !isAdmin && hasSubmission && !editing;
+  const showForm = !isAdmin && canModify && (!hasSubmission || editing);
 
   const startResubmit = () => {
     setSubmitError("");
@@ -251,7 +254,7 @@ function AssignmentDetailPage() {
             </div>
           )}
 
-          {isClosed && (
+          {!isAdmin && isClosed && (
             <div className="assignment-closed-banner">
               마감일이 지나 더 이상 {hasSubmission ? "수정" : "제출"}할 수 없습니다.
             </div>

@@ -40,9 +40,12 @@ function AssignmentListPage() {
     setIsLoading(true);
     setError("");
     try {
+      // 내 제출 내역(GET /members/me/submissions)은 백엔드가 학생 전용으로 제한한다(requireStudent).
+      // 관리자 계정으로 호출하면 403이 나므로, 관리자일 때는 아예 호출하지 않는다
+      // (관리자 화면에서는 개인 제출 상태 배지 대신 마감 여부만 보여준다).
       const [assignmentsData, submissionsData] = await Promise.all([
         getAssignments({ page, size: PAGE_SIZE }),
-        getMySubmissions({ page: 0, size: SUBMISSIONS_FETCH_SIZE }),
+        isAdmin ? Promise.resolve({ content: [] }) : getMySubmissions({ page: 0, size: SUBMISSIONS_FETCH_SIZE }),
       ]);
 
       // 공지 목록과 마찬가지로 응답이 배열 단독인지 페이지네이션 객체인지
@@ -68,7 +71,7 @@ function AssignmentListPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page]);
+  }, [page, isAdmin]);
 
   useEffect(() => {
     fetchAssignments();
