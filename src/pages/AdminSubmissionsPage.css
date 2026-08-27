@@ -1,0 +1,297 @@
+/*
+ * 과제 제출 현황 화면 전용 스타일.
+ * 기존 관리자 화면(AdminWritePage.css, AdminApprovalsPage.css) 톤과 동일한 디자인 토큰을 재사용한다.
+ */
+
+.admin-submissions__picker {
+  margin-bottom: 24px;
+}
+
+.admin-submissions__picker label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 8px;
+}
+
+.admin-submissions__select {
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background: #ffffff;
+  outline: none;
+}
+
+.admin-submissions__select:focus {
+  border-color: #002968;
+  box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
+}
+
+.admin-submissions__state {
+  padding: 48px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.admin-submissions__state--error {
+  color: #c23b3b;
+}
+
+.admin-submissions__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.admin-submissions__stat {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 18px 20px;
+}
+
+.admin-submissions__stat-label {
+  font-size: 13px;
+  color: #7a7a7a;
+  margin: 0 0 6px;
+}
+
+.admin-submissions__stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.admin-submissions__stat--late .admin-submissions__stat-value {
+  color: #c97a1d;
+}
+
+.admin-submissions__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-submissions__tab {
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #7a7a7a;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-submissions__tab:hover {
+  background: #f5f5f7;
+}
+
+.admin-submissions__tab.is-active {
+  background: #002968;
+  border-color: #002968;
+  color: #ffffff;
+}
+
+.admin-submissions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-submissions-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 18px;
+  padding: 20px 24px;
+}
+
+.admin-submissions-item__main {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.admin-submissions-item__name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.admin-submissions-item__number {
+  font-size: 14px;
+  color: #7a7a7a;
+}
+
+.admin-submissions-item__date {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.admin-submissions-item__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-submissions-item__status {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 9999px;
+}
+
+.admin-submissions-item__status.is-submitted {
+  background: #e7f7ee;
+  color: #1f9254;
+}
+
+.admin-submissions-item__status.is-late {
+  background: #fff3e0;
+  color: #c97a1d;
+}
+
+.admin-submissions-item__status.is-not-submitted {
+  background: #f0f0f0;
+  color: #7a7a7a;
+}
+
+.admin-submissions__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #7a7a7a;
+}
+
+.admin-submissions__pagination button {
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-submissions__pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 제출물 상세 모달 */
+.admin-submissions-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.admin-submissions-modal {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  box-sizing: border-box;
+}
+
+.admin-submissions-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.admin-submissions-modal__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+.admin-submissions-modal__close {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.admin-submissions-modal__meta {
+  font-size: 13px;
+  color: #7a7a7a;
+  margin: 0 0 20px;
+}
+
+.admin-submissions-modal__text {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1d1d1f;
+  background: #f5f5f7;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 0 16px;
+}
+
+.admin-submissions-modal__files-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 8px;
+}
+
+.admin-submissions-modal__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-submissions-modal__file-btn {
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #002968;
+  border-radius: 9999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-submissions-modal__file-btn:hover {
+  background: #f5f5f7;
+}
