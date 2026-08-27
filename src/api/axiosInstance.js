@@ -1,9 +1,14 @@
 import axios from "axios";
 
-// .env 파일의 VITE_API_BASE_URL로 백엔드 주소를 설정한다.
-// 로컬에서 백엔드를 직접 띄우지 않는 이상 localhost:8080이 아니라 실제 배포 주소를 넣어야 한다
-// (2026-08-27 기준 http://43.202.220.10:8080).
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
+// 프로덕션(Vercel) 빌드에서는 baseURL을 비워서 상대경로("/api/v1/...")로 요청한다.
+// Vercel이 HTTPS로 서빙되는데 백엔드(43.202.220.10:8080)는 아직 HTTP만 지원해서, 브라우저가
+// 직접 호출하면 Mixed Content로 차단된다. 그래서 vercel.json의 rewrites로 "/api/:path*"를
+// 백엔드로 서버 사이드 프록시하고, 프론트는 같은 오리진(satlms.vercel.app)으로만 요청을 보낸다.
+// 로컬 개발(npm run dev)에서는 이 프록시가 없으므로 .env의 VITE_API_BASE_URL(또는 기본값
+// localhost:8080)로 백엔드를 직접 호출한다.
+const BASE_URL = import.meta.env.PROD
+  ? ""
+  : import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
