@@ -12,8 +12,39 @@
 }
 
 .app-layout__content {
+  position: relative;
+  z-index: 1;
   flex: 999 1 460px;
   min-width: 0;
   padding: clamp(20px, 3vw, 36px) clamp(18px, 3.5vw, 44px);
   box-sizing: border-box;
+}
+
+/* 화면 우하단 명지나무 워터마크. 로그인 화면(BrandPanel)과 짝을 이루는 브랜딩 요소로,
+   뷰포트 기준으로 고정해 스크롤과 무관하게 항상 같은 자리에 떠 있는다.
+   흰/밝은 배경 위라 원본 남색을 그대로 살려 "남색 + 흰색" 조합이 되도록 하고,
+   콘텐츠를 가리지 않도록 클릭을 통과시키고(pointer-events: none) 카드보다 아래 레이어에 둔다. */
+.app-shell__watermark {
+  position: fixed;
+  right: -16px;
+  bottom: -16px;
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 860px) {
+  .app-shell__watermark {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell__watermark {
+    display: none;
+  }
 }

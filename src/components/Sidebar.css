@@ -1,9 +1,11 @@
 .sidebar {
-  flex: 1 1 180px;
-  max-width: 220px;
+  position: relative;
+  z-index: 1;
+  flex: 1 1 240px;
+  max-width: 268px;
   background: #ffffff;
   border-right: 1px solid #e0e0e0;
-  padding: 20px 12px;
+  padding: 28px 18px;
   box-sizing: border-box;
 }
 
@@ -11,7 +13,7 @@
   font-size: 12px;
   font-weight: 600;
   color: #7a7a7a;
-  padding: 8px 14px 8px;
+  padding: 8px 16px 10px;
   letter-spacing: -0.12px;
   margin: 0;
 }
@@ -19,11 +21,12 @@
 .sidebar__nav {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .sidebar__link {
   display: block;
-  padding: 11px 14px;
+  padding: 13px 16px;
   border-radius: 8px;
   font-size: 17px;
   font-weight: 400;
