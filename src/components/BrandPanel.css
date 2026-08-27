@@ -94,8 +94,18 @@
     padding: 28px 24px;
   }
 
+  .brand-panel__bgtype-line {
+    font-size: clamp(30px, 8.4vw, 56px);
+  }
+
   .brand-panel__watermark {
     width: 110px;
     height: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-panel__bgtype-line {
+    font-size: clamp(24px, 8.8vw, 38px);
   }
 }
