@@ -32,3 +32,33 @@ export const getUnreadNoticeCount = async () => {
   const { data } = await axiosInstance.get("/api/v1/notices/unread-count");
   return data;
 };
+
+/**
+ * 공지 등록 (관리자 전용)
+ * POST /api/v1/notices
+ * @param {{ title: string, content: string, isPinned?: boolean }} payload
+ * @returns {Promise<{ noticeId: number }>}
+ */
+export const createNotice = async ({ title, content, isPinned }) => {
+  const { data } = await axiosInstance.post("/api/v1/notices", { title, content, isPinned });
+  return data;
+};
+
+/**
+ * 공지 수정 (관리자 전용) — 보낸 필드만 반영된다 (부분 수정 API)
+ * PATCH /api/v1/notices/{noticeId}
+ * @param {number|string} noticeId
+ * @param {{ title?: string, content?: string, isPinned?: boolean }} payload
+ */
+export const updateNotice = async (noticeId, payload) => {
+  const { data } = await axiosInstance.patch(`/api/v1/notices/${noticeId}`, payload);
+  return data;
+};
+
+/**
+ * 공지 삭제 (관리자 전용)
+ * DELETE /api/v1/notices/{noticeId}
+ */
+export const deleteNotice = async (noticeId) => {
+  await axiosInstance.delete(`/api/v1/notices/${noticeId}`);
+};

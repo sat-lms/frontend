@@ -10,6 +10,8 @@ import AssignmentListPage from "./pages/AssignmentListPage";
 import AssignmentDetailPage from "./pages/AssignmentDetailPage";
 import AdminApprovalsPage from "./pages/AdminApprovalsPage";
 import AdminSubmissionsPage from "./pages/AdminSubmissionsPage";
+import NoticeWritePage from "./pages/NoticeWritePage";
+import AssignmentWritePage from "./pages/AssignmentWritePage";
 
 function App() {
   return (
@@ -73,6 +75,38 @@ function App() {
             element={
               <ProtectedRoute role="ADMIN">
                 <AdminSubmissionsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/notices/new"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <NoticeWritePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/notices/:noticeId/edit"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <NoticeWritePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/assignments/new"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AssignmentWritePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/assignments/:assignmentId/edit"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AssignmentWritePage />
               </ProtectedRoute>
             }
           />

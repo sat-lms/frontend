@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   getAssignmentDetail,
   getMySubmission,
   submitAssignment,
   resubmitAssignment,
   getSubmissionAttachmentDownloadUrl,
+  deleteAssignment,
 } from "../api/assignmentApi";
+import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./AssignmentDetailPage.css";
+import "./AdminWritePage.css";
 
 /**
  * 과제 상세 + 제출/재제출. 명세서 24/31/32/33번 API 연동.
@@ -23,11 +26,15 @@ import "./AssignmentDetailPage.css";
  */
 function AssignmentDetailPage() {
   const { assignmentId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
 
   const [assignment, setAssignment] = useState(null);
   const [submission, setSubmission] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [editing, setEditing] = useState(false);
   const [textContent, setTextContent] = useState("");
@@ -108,6 +115,19 @@ function AssignmentDetailPage() {
     }
   };
 
+  const handleDeleteAssignment = async () => {
+    if (!window.confirm("이 과제를 삭제할까요? 삭제하면 되돌릴 수 없습니다.")) return;
+    setIsDeleting(true);
+    try {
+      await deleteAssignment(assignmentId);
+      navigate("/assignments");
+    } catch (err) {
+      // 제출물이 이미 있는 과제는 백엔드가 409로 막는다 (submissionRepository.existsByAssignmentId).
+      alert(err.status === 409 ? "제출물이 있는 과제는 삭제할 수 없습니다." : err.message ?? "삭제에 실패했습니다.");
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <AppLayout>
       <Link to="/assignments" className="assignment-detail-page__back">
@@ -124,7 +144,24 @@ function AssignmentDetailPage() {
         <article className="assignment-detail">
           <div className="assignment-detail__head">
             <h1 className="assignment-detail__title">{assignment.title}</h1>
-            <StatusBadge hasSubmission={hasSubmission} isLate={submission?.isLate} isClosed={isClosed} />
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {isAdmin && (
+                <div className="admin-detail-actions">
+                  <Link to={`/admin/assignments/${assignmentId}/edit`} className="admin-detail-actions__btn">
+                    수정
+                  </Link>
+                  <button
+                    type="button"
+                    className="admin-detail-actions__btn admin-detail-actions__btn--danger"
+                    onClick={handleDeleteAssignment}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "삭제 중..." : "삭제"}
+                  </button>
+                </div>
+              )}
+              <StatusBadge hasSubmission={hasSubmission} isLate={submission?.isLate} isClosed={isClosed} />
+            </div>
           </div>
           <p className="assignment-detail__due">
             마감일시 · {formatDateTime(assignment.dueAt)}

@@ -111,3 +111,41 @@ export const getSubmissionAttachmentDownloadUrl = async (attachmentId) => {
   );
   return data;
 };
+
+/**
+ * 과제 등록 (관리자 전용)
+ * POST /api/v1/assignments
+ * dueAt은 백엔드가 "uuuu-MM-dd'T'HH:mm:ss" 형식(초 단위 포함, 타임존 없이 Asia/Seoul 기준으로
+ * 해석됨)만 엄격하게 허용한다 — <input type="datetime-local"> 값은 초가 빠져있으므로
+ * 호출하는 쪽(AssignmentWritePage)에서 ":00"을 붙여서 넘겨야 한다.
+ * @param {{ title: string, content: string, dueAt: string, allowLateSubmission: boolean }} payload
+ * @returns {Promise<{ assignmentId: number }>}
+ */
+export const createAssignment = async ({ title, content, dueAt, allowLateSubmission }) => {
+  const { data } = await axiosInstance.post("/api/v1/assignments", {
+    title,
+    content,
+    dueAt,
+    allowLateSubmission,
+  });
+  return data;
+};
+
+/**
+ * 과제 수정 (관리자 전용) — 보낸 필드만 반영된다 (부분 수정 API)
+ * PATCH /api/v1/assignments/{assignmentId}
+ * @param {number|string} assignmentId
+ * @param {{ title?: string, content?: string, dueAt?: string, allowLateSubmission?: boolean }} payload
+ */
+export const updateAssignment = async (assignmentId, payload) => {
+  const { data } = await axiosInstance.patch(`/api/v1/assignments/${assignmentId}`, payload);
+  return data;
+};
+
+/**
+ * 과제 삭제 (관리자 전용) — 제출물이 하나라도 있으면 백엔드가 409로 막는다.
+ * DELETE /api/v1/assignments/{assignmentId}
+ */
+export const deleteAssignment = async (assignmentId) => {
+  await axiosInstance.delete(`/api/v1/assignments/${assignmentId}`);
+};

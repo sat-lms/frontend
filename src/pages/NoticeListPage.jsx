@@ -1,12 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { getNotices, getUnreadNoticeCount } from "../api/noticeApi";
+import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./NoticeListPage.css";
+import "./AdminWritePage.css";
 
 const PAGE_SIZE = 10;
 
 function NoticeListPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
   const [notices, setNotices] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -69,10 +73,17 @@ function NoticeListPage() {
           </p>
         </div>
 
-        <label className="notice-page__filter">
-          <input type="checkbox" checked={unreadOnly} onChange={handleToggleUnreadOnly} />
-          안 읽은 공지만
-        </label>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12 }}>
+          {isAdmin && (
+            <Link to="/admin/notices/new" className="page-header-add-btn">
+              + 새 공지 작성
+            </Link>
+          )}
+          <label className="notice-page__filter">
+            <input type="checkbox" checked={unreadOnly} onChange={handleToggleUnreadOnly} />
+            안 읽은 공지만
+          </label>
+        </div>
       </div>
 
       {isLoading && <p className="notice-page__state">불러오는 중...</p>}

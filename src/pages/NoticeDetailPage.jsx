@@ -1,31 +1,50 @@
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getNoticeDetail } from "../api/noticeApi";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { getNoticeDetail, deleteNotice } from "../api/noticeApi";
+import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./NoticeDetailPage.css";
+import "./AdminWritePage.css";
 
 function NoticeDetailPage() {
   const { noticeId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
+
   const [notice, setNotice] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const fetchDetail = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const data = await getNoticeDetail(noticeId);
+      setNotice(data);
+    } catch (err) {
+      setError(err.status === 404 ? "존재하지 않는 공지입니다." : "공지를 불러오지 못했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [noticeId]);
 
   useEffect(() => {
-    const fetchDetail = async () => {
-      setIsLoading(true);
-      setError("");
-      try {
-        const data = await getNoticeDetail(noticeId);
-        setNotice(data);
-      } catch (err) {
-        setError(err.status === 404 ? "존재하지 않는 공지입니다." : "공지를 불러오지 못했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchDetail();
-  }, [noticeId]);
+  }, [fetchDetail]);
+
+  const handleDelete = async () => {
+    if (!window.confirm("이 공지를 삭제할까요? 삭제하면 되돌릴 수 없습니다.")) return;
+    setIsDeleting(true);
+    try {
+      await deleteNotice(noticeId);
+      navigate("/notices");
+    } catch (err) {
+      alert(err.message ?? "삭제에 실패했습니다.");
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <AppLayout>
@@ -41,7 +60,24 @@ function NoticeDetailPage() {
 
       {!isLoading && !error && notice && (
         <article className="notice-detail">
-          <h1 className="notice-detail__title">{notice.title}</h1>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
+            <h1 className="notice-detail__title">{notice.title}</h1>
+            {isAdmin && (
+              <div className="admin-detail-actions">
+                <Link to={`/admin/notices/${noticeId}/edit`} className="admin-detail-actions__btn">
+                  수정
+                </Link>
+                <button
+                  type="button"
+                  className="admin-detail-actions__btn admin-detail-actions__btn--danger"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "삭제 중..." : "삭제"}
+                </button>
+              </div>
+            )}
+          </div>
           <p className="notice-detail__meta">
             {notice.authorName} · {formatDate(notice.createdAt)}
           </p>

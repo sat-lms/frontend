@@ -8,6 +8,8 @@ const STUDENT_MENU = [
 ];
 
 const ADMIN_MENU = [
+  { label: "공지 작성", to: "/admin/notices/new" },
+  { label: "과제 등록", to: "/admin/assignments/new" },
   { label: "회원가입 승인", to: "/admin/approvals" },
   { label: "과제 제출 현황", to: "/admin/submissions" },
 ];
