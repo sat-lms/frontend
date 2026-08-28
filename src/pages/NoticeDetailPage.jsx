@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getNoticeDetail, deleteNotice } from "../api/noticeApi";
 import {
-  getNoticeAttachments,
   getNoticeAttachmentDownloadUrl,
   deleteNoticeAttachment,
 } from "../api/noticeAttachmentApi";
@@ -29,15 +28,10 @@ function NoticeDetailPage() {
     setIsLoading(true);
     setError("");
     try {
-      // 첨부파일 목록 조회는 백엔드에 아직 없을 수 있는 엔드포인트라(getNoticeAttachments가
-      // 404를 조용히 [] 로 처리함) 공지 본문 조회와 분리해서 병렬로 불러온다 — 첨부파일 쪽에서
-      // 문제가 생겨도 본문 조회에는 영향이 없게 한다.
-      const [data, attachmentsData] = await Promise.all([
-        getNoticeDetail(noticeId),
-        getNoticeAttachments(noticeId).catch(() => []),
-      ]);
+      // 첨부파일 목록은 별도 API가 아니라 공지 상세 응답의 attachments 필드로 함께 내려온다.
+      const data = await getNoticeDetail(noticeId);
       setNotice(data);
-      setAttachments(attachmentsData);
+      setAttachments(data.attachments ?? []);
     } catch (err) {
       setError(err.status === 404 ? "존재하지 않는 공지입니다." : "공지를 불러오지 못했습니다.");
     } finally {

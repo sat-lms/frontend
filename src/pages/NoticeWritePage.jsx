@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getNoticeDetail, createNotice, updateNotice } from "../api/noticeApi";
 import {
-  getNoticeAttachments,
   uploadNoticeAttachments,
   deleteNoticeAttachment,
   NOTICE_FILE_MAX_COUNT,
@@ -26,8 +25,8 @@ const TITLE_MAX_LENGTH = 100;
  * savedNoticeId로 기억) 그 자리에서 이어서 파일을 업로드한다 — 등록 자체는 됐는데 파일
  * 업로드만 실패하는 경우를 대비해, 실패하면 페이지를 벗어나지 않고 재시도할 수 있게 한다.
  *
- * ⚠️ 기존 첨부파일 목록(getNoticeAttachments)은 백엔드에 목록 조회 API가 아직 없으면 조용히
- * 빈 배열로 처리된다 — 그 경우 이번 세션에서 새로 올린 파일만 화면에 보인다(README 삼아 남김).
+ * 기존 첨부파일 목록은 별도 API가 아니라 수정 모드 진입 시 불러오는 공지 상세 조회
+ * (getNoticeDetail) 응답의 attachments 필드로 함께 내려온다.
  */
 function NoticeWritePage() {
   const { noticeId } = useParams();
@@ -57,14 +56,11 @@ function NoticeWritePage() {
     setIsLoading(true);
     setLoadError("");
     try {
-      const [data, attachmentsData] = await Promise.all([
-        getNoticeDetail(noticeId),
-        getNoticeAttachments(noticeId).catch(() => []),
-      ]);
+      const data = await getNoticeDetail(noticeId);
       setTitle(data.title ?? "");
       setContent(data.content ?? "");
       setIsPinned(!!data.isPinned);
-      setExistingAttachments(attachmentsData);
+      setExistingAttachments(data.attachments ?? []);
     } catch (err) {
       setLoadError(err.status === 404 ? "존재하지 않는 공지입니다." : "공지를 불러오지 못했습니다.");
     } finally {
