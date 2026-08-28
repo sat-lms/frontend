@@ -3,11 +3,13 @@ import { useAuth } from "../context/AuthContext";
 import "./Sidebar.css";
 
 const STUDENT_MENU = [
+  { label: "홈", to: "/" },
   { label: "공지사항", to: "/notices" },
   { label: "과제", to: "/assignments" },
 ];
 
 const ADMIN_MENU = [
+  { label: "홈", to: "/" },
   { label: "공지 작성", to: "/admin/notices/new" },
   { label: "과제 등록", to: "/admin/assignments/new" },
   { label: "회원가입 승인", to: "/admin/approvals" },
@@ -31,17 +33,20 @@ function Sidebar() {
       <p className="sidebar__section-label">{menuLabel}</p>
 
       <nav className="sidebar__nav">
-        {menuItems.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className={`sidebar__link ${
-              location.pathname.startsWith(item.to) ? "is-active" : ""
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
+        {menuItems.map((item) => {
+          // "홈"(to: "/")은 모든 경로가 "/"로 시작하므로 startsWith 대신 정확히 일치할 때만 활성 표시한다.
+          const isActive =
+            item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`sidebar__link ${isActive ? "is-active" : ""}`}
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );
