@@ -49,15 +49,39 @@
   box-shadow: inset 3px 0 0 #002968;
 }
 
+/* 좁은 화면에서는 세로 사이드바 대신, 헤더 바로 아래에 붙는 가로 스크롤 메뉴 바로 바꾼다.
+   글자 라벨만 있고 별도 아이콘이 없는 메뉴라서, 세로 폭을 아이콘 크기로 줄이면 내용이 아예
+   사라져버리기 때문에(글자를 숨길 수 없음) 폭을 줄이는 대신 가로 방향으로 눕히는 쪽을 택했다. */
 @media (max-width: 860px) {
   .sidebar {
-    flex-basis: 72px;
-    max-width: 72px;
-    padding: 20px 8px;
+    flex: 1 1 100%;
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #d7e0f2;
+    box-shadow: none;
+    padding: 10px clamp(12px, 3vw, 20px);
   }
 
-  .sidebar__section-label,
-  .sidebar__link {
+  .sidebar__section-label {
     display: none;
+  }
+
+  .sidebar__nav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar__link {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 9px 14px;
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+
+  .sidebar__link.is-active {
+    box-shadow: none;
   }
 }

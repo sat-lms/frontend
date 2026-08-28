@@ -48,11 +48,13 @@
   flex-wrap: wrap;
   gap: 12px 18px;
   background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 18px;
+  border: 1px solid #d7e0f2;
+  border-left: 4px solid #002968;
+  border-radius: 14px;
   padding: 24px;
   text-decoration: none;
   color: inherit;
+  box-sizing: border-box;
 }
 
 .assignment-item:hover {
