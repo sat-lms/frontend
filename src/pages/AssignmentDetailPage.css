@@ -35,7 +35,8 @@
   max-width: 1100px;
   margin: 0 auto;
   background: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d7e0f2;
+  border-top: 4px solid #002968;
   border-radius: 18px;
   padding: clamp(22px, 3vw, 36px);
   box-sizing: border-box;
@@ -144,6 +145,10 @@
 
 .assignment-file-chip__name:hover {
   text-decoration: underline;
+}
+
+.assignment-file-chip__size {
+  color: #9ca3af;
 }
 
 button.assignment-file-chip__name {
