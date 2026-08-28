@@ -4,7 +4,8 @@
   flex: 1 1 240px;
   max-width: 268px;
   background: #ffffff;
-  border-right: 1px solid #002968;
+  border-right: 1px solid #d7e0f2;
+  box-shadow: inset -3px 0 0 rgba(0, 41, 104, 0.06);
   padding: 28px 18px;
   box-sizing: border-box;
 }
