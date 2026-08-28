@@ -114,9 +114,6 @@ function DashboardPage() {
   return (
     <AppLayout>
       <h1 className="page-title">안녕하세요, {user?.name}님</h1>
-      <p className="page-subtitle">
-        학번 {user?.studentNumber} · {isAdmin ? "관리자" : "학생"}
-      </p>
 
       {isAdmin ? (
         <div className="dashboard__stats">
