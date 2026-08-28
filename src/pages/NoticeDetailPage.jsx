@@ -1,10 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getNoticeDetail, deleteNotice } from "../api/noticeApi";
+import {
+  getNoticeAttachments,
+  getNoticeAttachmentDownloadUrl,
+  deleteNoticeAttachment,
+} from "../api/noticeAttachmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./NoticeDetailPage.css";
 import "./AdminWritePage.css";
+import "./AssignmentDetailPage.css"; // 첨부파일 칩(.assignment-file-chip) 스타일 재사용
 
 function NoticeDetailPage() {
   const { noticeId } = useParams();
@@ -13,16 +19,25 @@ function NoticeDetailPage() {
   const isAdmin = user?.role === "ADMIN";
 
   const [notice, setNotice] = useState(null);
+  const [attachments, setAttachments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState(null);
 
   const fetchDetail = useCallback(async () => {
     setIsLoading(true);
     setError("");
     try {
-      const data = await getNoticeDetail(noticeId);
+      // 첨부파일 목록 조회는 백엔드에 아직 없을 수 있는 엔드포인트라(getNoticeAttachments가
+      // 404를 조용히 [] 로 처리함) 공지 본문 조회와 분리해서 병렬로 불러온다 — 첨부파일 쪽에서
+      // 문제가 생겨도 본문 조회에는 영향이 없게 한다.
+      const [data, attachmentsData] = await Promise.all([
+        getNoticeDetail(noticeId),
+        getNoticeAttachments(noticeId).catch(() => []),
+      ]);
       setNotice(data);
+      setAttachments(attachmentsData);
     } catch (err) {
       setError(err.status === 404 ? "존재하지 않는 공지입니다." : "공지를 불러오지 못했습니다.");
     } finally {
@@ -43,6 +58,28 @@ function NoticeDetailPage() {
     } catch (err) {
       alert(err.message ?? "삭제에 실패했습니다.");
       setIsDeleting(false);
+    }
+  };
+
+  const handleDownloadAttachment = async (attachmentId) => {
+    try {
+      const { downloadUrl } = await getNoticeAttachmentDownloadUrl(attachmentId);
+      window.open(downloadUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      alert("파일 다운로드 링크를 가져오지 못했습니다.");
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId) => {
+    if (!window.confirm("이 첨부파일을 삭제할까요?")) return;
+    setDeletingAttachmentId(attachmentId);
+    try {
+      await deleteNoticeAttachment(attachmentId);
+      setAttachments((prev) => prev.filter((a) => a.attachmentId !== attachmentId));
+    } catch (err) {
+      alert(err.message ?? "첨부파일 삭제에 실패했습니다.");
+    } finally {
+      setDeletingAttachmentId(null);
     }
   };
 
@@ -86,7 +123,39 @@ function NoticeDetailPage() {
           </p>
           <div className="notice-detail__content">{notice.content}</div>
 
-          {/* TODO: 첨부파일 목록 + Presigned URL 다운로드 (명세서 21번 API) */}
+          {attachments.length > 0 && (
+            <div className="assignment-detail__refs">
+              <p className="assignment-detail__refs-label">첨부파일</p>
+              <div className="assignment-detail__refs-list">
+                {attachments.map((file) => (
+                  <span key={file.attachmentId} className="assignment-file-chip">
+                    <button
+                      type="button"
+                      className="assignment-file-chip__name"
+                      onClick={() => handleDownloadAttachment(file.attachmentId)}
+                    >
+                      {file.originalName}
+                      {file.formattedSize && (
+                        <span className="assignment-file-chip__size"> · {file.formattedSize}</span>
+                      )}
+                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="assignment-file-chip__remove"
+                        onClick={() => handleDeleteAttachment(file.attachmentId)}
+                        disabled={deletingAttachmentId === file.attachmentId}
+                        aria-label={`${file.originalName} 삭제`}
+                        title="첨부파일 삭제"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       )}
     </AppLayout>
