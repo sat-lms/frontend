@@ -6,7 +6,11 @@ import {
   submitAssignment,
   resubmitAssignment,
   getSubmissionAttachmentDownloadUrl,
+  deleteSubmissionAttachment,
   deleteAssignment,
+  SUBMISSION_FILE_MAX_COUNT,
+  SUBMISSION_FILE_MAX_SIZE_BYTES,
+  SUBMISSION_FILE_MAX_TOTAL_SIZE_BYTES,
 } from "../api/assignmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
@@ -16,13 +20,18 @@ import "./AdminWritePage.css";
 /**
  * 과제 상세 + 제출/재제출. 명세서 24/31/32/33번 API 연동.
  *
- * ⚠️ 파일 첨부 업로드(32/33번의 files 파트)는 오늘 연동 범위에서 제외했다 — 아래 "파일 첨부"
- * 영역은 비활성 목업이고, 제출/재제출은 답안 텍스트(textContent)만 서버로 보낸다.
- * (백엔드 자체는 이미 파일 업로드를 지원하지만, 오늘은 텍스트 제출까지만 하기로 함.)
+ * 파일 첨부 업로드(32/33번의 files 파트)까지 연동한다. 백엔드는 최대 5개, 개당 50MB,
+ * 총 100MB까지 지원한다(SubmissionService 기준).
+ *
+ * ⚠️ 재제출은 "부분 수정"이 아니라 파일을 통째로 교체하는 방식이다 — 재제출 요청에 파일을
+ * 안 실으면 기존에 첨부돼 있던 파일도 같이 사라진다(백엔드가 이전 첨부를 전부 지우고 이번
+ * 요청 것으로 바꿔치기함). 원본 파일 바이트를 서버에서 다시 받아와 재업로드하는 건
+ * 불가능하므로(다운로드 URL만 있음), 기존 파일을 유지하고 싶으면 재제출할 때 로컬에서
+ * 다시 선택해서 첨부해야 한다 — 이 사실을 재제출 폼에 안내 문구로 명시한다.
+ * 파일 하나만 떼고 싶을 때는 전체 재제출 대신 개별 삭제(DELETE .../submission-attachments/{id})를 쓴다.
  *
  * 참고: 이 백엔드에는 "과제 참고 첨부파일"(관리자가 미리 올려두는 안내 파일) 개념이 없어서
- * 그 UI는 넣지 않았다. 파일은 학생이 제출할 때 같이 올리는 제출 첨부파일뿐이라, 이미 제출한
- * 파일이 있다면(추후 업로드 기능이 붙으면) 아래 "제출한 파일" 목록에서 내려받을 수 있다.
+ * 그 UI는 넣지 않았다. 파일은 학생이 제출할 때 같이 올리는 제출 첨부파일뿐이다.
  */
 function AssignmentDetailPage() {
   const { assignmentId } = useParams();
@@ -38,8 +47,11 @@ function AssignmentDetailPage() {
 
   const [editing, setEditing] = useState(false);
   const [textContent, setTextContent] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState(null);
 
   const fetchAll = useCallback(async () => {
     setIsLoading(true);
@@ -76,31 +88,68 @@ function AssignmentDetailPage() {
   const showReceipt = !isAdmin && hasSubmission && !editing;
   const showForm = !isAdmin && canModify && (!hasSubmission || editing);
 
+  const resetFileSelection = () => {
+    setSelectedFiles([]);
+    setFileInputKey((prev) => prev + 1);
+  };
+
   const startResubmit = () => {
     setSubmitError("");
     setTextContent(submission?.textContent ?? "");
+    resetFileSelection();
     setEditing(true);
   };
 
   const cancelEdit = () => {
     setSubmitError("");
+    resetFileSelection();
     setEditing(false);
   };
 
+  const handleFileChange = (e) => {
+    const picked = Array.from(e.target.files ?? []);
+    if (picked.length === 0) return;
+
+    const combined = [...selectedFiles, ...picked];
+    if (combined.length > SUBMISSION_FILE_MAX_COUNT) {
+      setSubmitError(`파일은 최대 ${SUBMISSION_FILE_MAX_COUNT}개까지 첨부할 수 있습니다.`);
+      return;
+    }
+    const oversizedFile = picked.find((file) => file.size > SUBMISSION_FILE_MAX_SIZE_BYTES);
+    if (oversizedFile) {
+      setSubmitError(`파일 1개의 용량은 ${SUBMISSION_FILE_MAX_SIZE_BYTES / 1024 / 1024}MB를 초과할 수 없습니다.`);
+      return;
+    }
+    const totalSize = combined.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > SUBMISSION_FILE_MAX_TOTAL_SIZE_BYTES) {
+      setSubmitError(`전체 파일 용량은 ${SUBMISSION_FILE_MAX_TOTAL_SIZE_BYTES / 1024 / 1024}MB를 초과할 수 없습니다.`);
+      return;
+    }
+
+    setSubmitError("");
+    setSelectedFiles(combined);
+    setFileInputKey((prev) => prev + 1); // 같은 파일을 다시 골라도 onChange가 또 발생하도록 input을 리셋
+  };
+
+  const removeSelectedFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
-    if (!textContent.trim()) {
-      setSubmitError("답안 내용을 입력해 주세요.");
+    if (!textContent.trim() && selectedFiles.length === 0) {
+      setSubmitError("답안 내용이나 파일을 하나 이상 입력해 주세요.");
       return;
     }
     setIsSubmitting(true);
     setSubmitError("");
     try {
       if (hasSubmission) {
-        await resubmitAssignment(assignmentId, { textContent });
+        await resubmitAssignment(assignmentId, { textContent, files: selectedFiles });
       } else {
-        await submitAssignment(assignmentId, { textContent });
+        await submitAssignment(assignmentId, { textContent, files: selectedFiles });
       }
       setEditing(false);
+      resetFileSelection();
       await fetchAll();
     } catch (err) {
       setSubmitError(err.message ?? "제출에 실패했습니다.");
@@ -115,6 +164,21 @@ function AssignmentDetailPage() {
       window.open(downloadUrl, "_blank", "noopener,noreferrer");
     } catch {
       alert("파일 다운로드 링크를 가져오지 못했습니다.");
+    }
+  };
+
+  // 전체 재제출 없이 이미 제출된 파일 하나만 뗀다. 삭제 후 텍스트도 파일도 하나도 안 남으면
+  // 백엔드가 400으로 막고 "제출물 전체를 삭제하려면..." 안내 메시지를 내려주므로 그대로 보여준다.
+  const handleDeleteFile = async (attachmentId) => {
+    if (!window.confirm("이 파일을 삭제할까요?")) return;
+    setDeletingAttachmentId(attachmentId);
+    try {
+      await deleteSubmissionAttachment(attachmentId);
+      await fetchAll();
+    } catch (err) {
+      alert(err.message ?? "파일 삭제에 실패했습니다.");
+    } finally {
+      setDeletingAttachmentId(null);
     }
   };
 
@@ -192,14 +256,27 @@ function AssignmentDetailPage() {
                   <p className="assignment-detail__refs-label">제출한 파일</p>
                   <div className="assignment-detail__refs-list">
                     {submission.files.map((file) => (
-                      <button
-                        key={file.attachmentId}
-                        type="button"
-                        className="assignment-file-chip"
-                        onClick={() => handleDownloadFile(file.attachmentId)}
-                      >
-                        {file.originalName}
-                      </button>
+                      <span key={file.attachmentId} className="assignment-file-chip">
+                        <button
+                          type="button"
+                          className="assignment-file-chip__name"
+                          onClick={() => handleDownloadFile(file.attachmentId)}
+                        >
+                          {file.originalName}
+                        </button>
+                        {canModify && (
+                          <button
+                            type="button"
+                            className="assignment-file-chip__remove"
+                            onClick={() => handleDeleteFile(file.attachmentId)}
+                            disabled={deletingAttachmentId === file.attachmentId}
+                            aria-label={`${file.originalName} 삭제`}
+                            title="파일 삭제"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -218,12 +295,46 @@ function AssignmentDetailPage() {
               />
 
               <p className="assignment-form__label">파일 첨부</p>
-              <div className="assignment-form__file-mock">
-                <div className="assignment-form__file-mock-title">파일 첨부는 준비 중입니다</div>
-                <div className="assignment-form__file-mock-desc">
-                  파일 첨부 기능 연동 전까지는 답안 텍스트만 제출됩니다.
+              {hasSubmission && (
+                <p className="assignment-form__hint" style={{ margin: "0 0 10px" }}>
+                  재제출하면 파일이 이번에 첨부한 것으로 통째로 교체됩니다. 기존 파일을 계속
+                  유지하려면 아래에서 다시 선택해서 첨부해 주세요 — 아무것도 첨부하지 않으면
+                  기존 파일도 함께 삭제됩니다.
+                </p>
+              )}
+              <label className="assignment-form__file-input-label">
+                <input
+                  key={fileInputKey}
+                  type="file"
+                  multiple
+                  className="assignment-form__file-input"
+                  onChange={handleFileChange}
+                />
+                <span>+ 파일 선택</span>
+                <span className="assignment-form__file-input-hint">
+                  최대 {SUBMISSION_FILE_MAX_COUNT}개 · 개당 {SUBMISSION_FILE_MAX_SIZE_BYTES / 1024 / 1024}MB ·
+                  전체 {SUBMISSION_FILE_MAX_TOTAL_SIZE_BYTES / 1024 / 1024}MB 이내
+                </span>
+              </label>
+
+              {selectedFiles.length > 0 && (
+                <div className="assignment-detail__refs-list" style={{ marginTop: 10 }}>
+                  {selectedFiles.map((file, index) => (
+                    <span key={`${file.name}-${file.lastModified}-${index}`} className="assignment-file-chip">
+                      <span className="assignment-file-chip__name">{file.name}</span>
+                      <button
+                        type="button"
+                        className="assignment-file-chip__remove"
+                        onClick={() => removeSelectedFile(index)}
+                        aria-label={`${file.name} 첨부 취소`}
+                        title="첨부 취소"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
                 </div>
-              </div>
+              )}
 
               {submitError && <p className="assignment-form__error">{submitError}</p>}
 
