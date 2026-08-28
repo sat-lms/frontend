@@ -26,10 +26,10 @@
    콘텐츠를 가리지 않도록 클릭을 통과시키고(pointer-events: none) 카드보다 아래 레이어에 둔다. */
 .app-shell__watermark {
   position: fixed;
-  right: -28px;
-  bottom: -28px;
-  width: 320px;
-  height: 320px;
+  right: -20px;
+  bottom: -20px;
+  width: 224px;
+  height: 224px;
   object-fit: contain;
   opacity: 0.7;
   pointer-events: none;
@@ -38,17 +38,17 @@
 
 @media (max-width: 860px) {
   .app-shell__watermark {
-    width: 200px;
-    height: 200px;
-    right: -18px;
-    bottom: -18px;
+    width: 140px;
+    height: 140px;
+    right: -13px;
+    bottom: -13px;
   }
 }
 
 @media (max-width: 560px) {
   .app-shell__watermark {
-    width: 130px;
-    height: 130px;
+    width: 91px;
+    height: 91px;
     opacity: 0.55;
   }
 }
