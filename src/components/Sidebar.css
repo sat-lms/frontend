@@ -46,7 +46,7 @@
   background: #eef2f8;
   color: #002968;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 #002968;
+  box-shadow: inset 3px 0 0 rgba(0, 41, 104, 0.4);
 }
 
 /* 좁은 화면에서는 세로 사이드바 대신, 헤더 바로 아래에 붙는 가로 스크롤 메뉴 바로 바꾼다.

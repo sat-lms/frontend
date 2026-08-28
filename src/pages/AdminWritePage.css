@@ -37,7 +37,7 @@
   margin: 0 auto;
   background: #ffffff;
   border: 1px solid #d7e0f2;
-  border-top: 4px solid #002968;
+  border-top: 4px solid rgba(0, 41, 104, 0.4);
   border-radius: 18px;
   padding: clamp(22px, 3vw, 36px);
   box-sizing: border-box;
