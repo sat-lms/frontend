@@ -12,13 +12,14 @@ import {
   SUBMISSION_FILE_MAX_SIZE_BYTES,
   SUBMISSION_FILE_MAX_TOTAL_SIZE_BYTES,
 } from "../api/assignmentApi";
+import { getAssignmentAttachmentDownloadUrl, deleteAssignmentAttachment } from "../api/assignmentAttachmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./AssignmentDetailPage.css";
 import "./AdminWritePage.css";
 
 /**
- * 과제 상세 + 제출/재제출. 명세서 24/31/32/33번 API 연동.
+ * 과제 상세 + 제출/재제출. 명세서 24/28/30/31/32/33번 API 연동.
  *
  * 파일 첨부 업로드(32/33번의 files 파트)까지 연동한다. 백엔드는 최대 5개, 개당 50MB,
  * 총 100MB까지 지원한다(SubmissionService 기준).
@@ -30,8 +31,11 @@ import "./AdminWritePage.css";
  * 다시 선택해서 첨부해야 한다 — 이 사실을 재제출 폼에 안내 문구로 명시한다.
  * 파일 하나만 떼고 싶을 때는 전체 재제출 대신 개별 삭제(DELETE .../submission-attachments/{id})를 쓴다.
  *
- * 참고: 이 백엔드에는 "과제 참고 첨부파일"(관리자가 미리 올려두는 안내 파일) 개념이 없어서
- * 그 UI는 넣지 않았다. 파일은 학생이 제출할 때 같이 올리는 제출 첨부파일뿐이다.
+ * 참고 첨부파일(관리자가 과제 등록/수정 화면에서 미리 올려두는 안내 파일, 명세서 28/29/30번)은
+ * 학생이 제출할 때 같이 올리는 제출 첨부파일과 완전히 다른 목록이다 — 여기 assignment.attachments가
+ * 참고 첨부, submission.files가 제출 첨부. 업로드/삭제는 관리자 전용이라 과제 등록/수정 화면
+ * (AssignmentWritePage)에서 하고, 이 상세 화면에서는 모두에게 다운로드만 보여주고 관리자에게만
+ * 삭제 버튼도 함께 보여준다(수정 화면까지 안 가도 바로 뗄 수 있게).
  */
 function AssignmentDetailPage() {
   const { assignmentId } = useParams();
@@ -52,6 +56,7 @@ function AssignmentDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [deletingAttachmentId, setDeletingAttachmentId] = useState(null);
+  const [deletingRefAttachmentId, setDeletingRefAttachmentId] = useState(null);
 
   const fetchAll = useCallback(async () => {
     setIsLoading(true);
@@ -182,6 +187,33 @@ function AssignmentDetailPage() {
     }
   };
 
+  const handleDownloadRefAttachment = async (attachmentId) => {
+    try {
+      const { downloadUrl } = await getAssignmentAttachmentDownloadUrl(attachmentId);
+      window.open(downloadUrl, "_blank", "noopener,noreferrer");
+    } catch {
+      alert("파일 다운로드 링크를 가져오지 못했습니다.");
+    }
+  };
+
+  // 관리자가 과제 등록/수정 화면에서 미리 올려둔 참고 첨부파일 삭제. 학생의 제출 파일
+  // 삭제(handleDeleteFile)와는 별개 API(assignment-attachments)를 쓴다.
+  const handleDeleteRefAttachment = async (attachmentId) => {
+    if (!window.confirm("이 첨부파일을 삭제할까요?")) return;
+    setDeletingRefAttachmentId(attachmentId);
+    try {
+      await deleteAssignmentAttachment(attachmentId);
+      setAssignment((prev) => ({
+        ...prev,
+        attachments: (prev.attachments ?? []).filter((a) => a.attachmentId !== attachmentId),
+      }));
+    } catch (err) {
+      alert(err.message ?? "첨부파일 삭제에 실패했습니다.");
+    } finally {
+      setDeletingRefAttachmentId(null);
+    }
+  };
+
   const handleDeleteAssignment = async () => {
     if (!window.confirm("이 과제를 삭제할까요? 삭제하면 되돌릴 수 없습니다.")) return;
     setIsDeleting(true);
@@ -235,6 +267,40 @@ function AssignmentDetailPage() {
             {assignment.allowLateSubmission && " · 지각 제출 허용"}
           </p>
           <div className="assignment-detail__content">{assignment.content}</div>
+
+          {assignment.attachments?.length > 0 && (
+            <div className="assignment-detail__refs">
+              <p className="assignment-detail__refs-label">참고 첨부파일</p>
+              <div className="assignment-detail__refs-list">
+                {assignment.attachments.map((file) => (
+                  <span key={file.attachmentId} className="assignment-file-chip">
+                    <button
+                      type="button"
+                      className="assignment-file-chip__name"
+                      onClick={() => handleDownloadRefAttachment(file.attachmentId)}
+                    >
+                      {file.originalName}
+                      {file.formattedSize && (
+                        <span className="assignment-file-chip__size"> · {file.formattedSize}</span>
+                      )}
+                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="assignment-file-chip__remove"
+                        onClick={() => handleDeleteRefAttachment(file.attachmentId)}
+                        disabled={deletingRefAttachmentId === file.attachmentId}
+                        aria-label={`${file.originalName} 삭제`}
+                        title="첨부파일 삭제"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {showReceipt && (
             <div className="assignment-receipt">

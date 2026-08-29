@@ -16,9 +16,11 @@ export const getAssignments = async (params = {}) => {
 /**
  * 과제 상세 조회
  * GET /api/v1/assignments/{assignmentId}
- * 참고: 이 백엔드는 "과제 참고 첨부파일"(관리자가 미리 올려두는 안내 파일) 개념이 없다.
- * 파일은 학생이 제출할 때 함께 올리는 제출 첨부파일(submission-attachments)뿐이다.
- * @returns {Promise<{ assignmentId: number, title: string, content: string, dueAt: string, allowLateSubmission: boolean }>}
+ * 명세서 24번: 응답에 관리자가 미리 올려둔 "참고 첨부파일" 목록도 attachments 필드로 함께
+ * 내려온다 (공지 상세 조회와 동일한 패턴 — 별도 목록 조회 API는 없다).
+ * 학생이 과제를 제출할 때 함께 올리는 제출 첨부파일(submission-attachments)과는 다른
+ * 개념이니 혼동하지 말 것 — 그건 getMySubmission()의 files로 따로 내려온다.
+ * @returns {Promise<{ assignmentId: number, title: string, content: string, dueAt: string, allowLateSubmission: boolean, attachments?: Array<{ attachmentId: number, originalName: string, extension: string, sizeKb: number, formattedSize: string }> }>}
  */
 export const getAssignmentDetail = async (assignmentId) => {
   const { data } = await axiosInstance.get(`/api/v1/assignments/${assignmentId}`);
