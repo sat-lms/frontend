@@ -36,16 +36,10 @@
   letter-spacing: 0.5px;
 }
 
-.app-header__title {
+.app-header__role {
   font-weight: 700;
   font-size: 15px;
-  line-height: 1.3;
   color: #ffffff;
-}
-
-.app-header__role {
-  font-size: 11px;
-  color: #b7c9ec;
 }
 
 .app-header__user {

@@ -16,10 +16,7 @@ function Header() {
     <header className="app-header">
       <Link to="/" className="app-header__brand" aria-label="홈으로 이동">
         <div className="app-header__logo">SAT</div>
-        <div>
-          <div className="app-header__title">명지대학교 과제제출시스템</div>
-          <div className="app-header__role">{isAdmin ? "관리자" : "학생"}</div>
-        </div>
+        <div className="app-header__role">{isAdmin ? "관리자" : "학생"}</div>
       </Link>
 
       <div className="app-header__user">
