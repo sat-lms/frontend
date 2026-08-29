@@ -9,14 +9,15 @@ import "./Header.css";
  */
 function Header() {
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === "ADMIN";
   const initial = user?.name ? user.name.charAt(0) : "?";
 
   return (
     <header className="app-header">
+      {/* 역할(관리자/학생) 표시는 우측 사용자 정보 영역 하나로 통일한다.
+          예전엔 로고 옆에도 같은 역할 라벨을 띄웠는데, 관리자 계정의 이름이
+          "관리자"인 경우처럼 오른쪽과 문구가 겹쳐 보여 좌측 라벨은 제거했다. */}
       <Link to="/" className="app-header__brand" aria-label="홈으로 이동">
         <div className="app-header__logo">SAT</div>
-        <div className="app-header__role">{isAdmin ? "관리자" : "학생"}</div>
       </Link>
 
       <div className="app-header__user">
