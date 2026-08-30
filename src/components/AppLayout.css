@@ -6,15 +6,13 @@
 }
 
 .app-layout {
-  display: flex;
-  flex-wrap: wrap;
   flex: 1;
+  min-width: 0;
 }
 
 .app-layout__content {
   position: relative;
   z-index: 1;
-  flex: 999 1 460px;
   min-width: 0;
   padding: clamp(20px, 3vw, 36px) clamp(18px, 3.5vw, 44px);
   box-sizing: border-box;
