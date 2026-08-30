@@ -6,6 +6,7 @@ const STUDENT_MENU = [
   { label: "홈", to: "/" },
   { label: "공지사항", to: "/notices" },
   { label: "과제", to: "/assignments" },
+  { label: "마이페이지", to: "/mypage" },
 ];
 
 const ADMIN_MENU = [
@@ -13,7 +14,9 @@ const ADMIN_MENU = [
   { label: "공지 작성", to: "/admin/notices/new" },
   { label: "과제 등록", to: "/admin/assignments/new" },
   { label: "회원가입 승인", to: "/admin/approvals" },
+  { label: "회원 관리", to: "/admin/members" },
   { label: "과제 제출 현황", to: "/admin/submissions" },
+  { label: "마이페이지", to: "/mypage" },
 ];
 
 /**

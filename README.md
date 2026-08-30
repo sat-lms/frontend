@@ -1,50 +1,21 @@
-# SAT-LMS Frontend (React + Vite)
+# SAT-LMS API 명세서 대조 수정 패치
 
-## 폴더 구조
+API 명세서(SATLMS_API_명세_수정본.pdf)와 실제 코드를 비교해 빠져 있던 API/화면을 추가하고,
+발견된 버그를 고친 결과물입니다. 아래 경로 그대로 기존 저장소의 `src/` 밑에 덮어쓰면 됩니다.
 
-```
-src/
-  api/
-    axiosInstance.js   # 공통 axios 인스턴스 (baseURL, 토큰 인터셉터, 에러 정규화)
-    authApi.js          # signup / login / logout
-  pages/
-    SignupPage.jsx
-    LoginPage.jsx
-    AuthPage.css         # 두 페이지가 공유하는 스타일
-  utils/
-    validators.js        # API 명세서 필드 검증 규칙 (프론트 사전 검증용)
-  components/             # 향후 공용 컴포넌트 (Button, Input 등) 배치 예정
-  App.jsx                 # 라우팅 (/signup, /login)
-```
+## 새로 추가된 파일
+- `src/pages/MyPage.jsx`, `src/pages/MyPage.css` — 마이페이지(정보 수정 / 비밀번호 변경 / 회원 탈퇴)
+- `src/pages/AdminMembersPage.jsx`, `src/pages/AdminMembersPage.css` — 관리자 전체 회원 관리(목록/상세/역할 변경)
 
-## 실행 전 준비
+## 수정된 파일
+- `src/api/memberApi.js` — `updateMyInfo`, `changeMyPassword`, `withdrawMe` 추가
+- `src/api/adminMemberApi.js` — `getAllMembers`, `getMemberDetail`, `updateMemberRole` 추가
+- `src/api/assignmentApi.js` — `deleteSubmission`(제출물 전체 삭제) 추가
+- `src/utils/validators.js` — `getPasswordChangeErrors` 추가
+- `src/context/AuthContext.jsx` — 로그인 응답(memberId)과 내 정보 조회 응답(id) 필드 불일치 정규화, `updateUser` 추가
+- `src/pages/AssignmentDetailPage.jsx`, `src/pages/AssignmentDetailPage.css` — "제출물 전체 삭제" 버튼 연동
+- `src/App.jsx` — `/mypage`, `/admin/members` 라우트 추가
+- `src/components/Sidebar.jsx` — 마이페이지·회원 관리 메뉴 추가
+- `src/components/Header.jsx`, `src/components/Header.css` — 프로필 영역을 마이페이지로 이동하는 링크로 변경
 
-1. `.env.example`을 `.env`로 복사하고 백엔드 주소를 맞춘다.
-   ```
-   VITE_API_BASE_URL=http://localhost:8080
-   ```
-2. 패키지 설치
-   ```
-   npm install axios react-router-dom
-   ```
-
-## 반영한 명세서 규칙
-
-- **회원가입 (`POST /api/v1/auth/signup`)**
-  - studentNumber: 숫자 8~10자리
-  - name: 1~20자, 공백만 입력 불가
-  - password: 8자 이상 + 영문/숫자 포함
-  - passwordConfirm 일치 여부는 프론트에서 먼저 검증 (DB에는 저장 안 함)
-  - 성공 시 로그인 페이지로 이동 + 승인 대기 안내 메시지 전달
-  - 학번 중복(409) 시 필드 에러로 표시
-
-- **로그인 (`POST /api/v1/auth/login`)**
-  - 성공 시 `accessToken`, `memberId`, `role`을 localStorage에 저장
-  - role이 ADMIN이면 `/admin`, STUDENT면 `/`로 분기 (현재는 임시 라우트)
-  - PENDING / REJECTED / WITHDRAWN 상태별 안내 메시지 처리 (백엔드 응답 형태에 맞춰 `LoginPage.jsx`의 `STATUS_MESSAGE` 부분 조정 필요)
-
-## 다음에 확인해야 할 것
-
-- 백엔드가 로그인 실패 시 상태(PENDING 등)를 **어떤 필드명**으로 내려주는지 (`status`? `errorCode`?) — 지금은 추정으로 넣어뒀으니 실제 응답 보고 `LoginPage.jsx` 쪽 매핑만 고치면 됨
-- accessToken 방식인지 세션(쿠키) 방식인지 백엔드와 확정 → `axiosInstance.js`의 `withCredentials` 값 조정
-- 로그인 성공 후 이동할 실제 대시보드/공지 라우트는 아직 placeholder
+각 파일의 상세 변경 사유는 파일 내 주석에 남겨뒀습니다.

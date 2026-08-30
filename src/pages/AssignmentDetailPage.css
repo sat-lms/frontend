@@ -212,6 +212,13 @@ button.assignment-file-chip__name {
   color: #c97a1d;
 }
 
+.assignment-receipt__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .assignment-receipt__text {
   font-size: 17px;
   line-height: 1.47;
@@ -336,6 +343,18 @@ button.assignment-file-chip__name {
 
 .assignment-btn--ghost:hover:not(:disabled) {
   background: #f5f5f7;
+}
+
+.assignment-btn--danger {
+  border: 1px solid #f6c9cc;
+  background: #ffffff;
+  color: #c23b3b;
+  font-size: 14px;
+  padding: 9px 15px;
+}
+
+.assignment-btn--danger:hover:not(:disabled) {
+  background: #fdebec;
 }
 
 .assignment-form__hint {

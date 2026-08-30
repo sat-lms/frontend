@@ -44,3 +44,24 @@ export const getLoginErrors = ({ studentNumber, password }) => {
 
   return errors;
 };
+
+// 명세서 6번(PATCH /api/v1/members/me/password) 기준 사전 검증.
+// currentPassword의 실제 일치 여부는 백엔드만 판단할 수 있으므로 여기서는 값이 비어있는지만 본다.
+export const getPasswordChangeErrors = ({ currentPassword, newPassword, newPasswordConfirm }) => {
+  const errors = {};
+
+  if (!currentPassword) {
+    errors.currentPassword = "현재 비밀번호를 입력해주세요.";
+  }
+  if (!isValidPassword(newPassword)) {
+    errors.newPassword = "새 비밀번호는 8자 이상, 영문과 숫자를 포함해야 합니다.";
+  }
+  if (newPassword !== newPasswordConfirm) {
+    errors.newPasswordConfirm = "새 비밀번호가 일치하지 않습니다.";
+  }
+  if (currentPassword && newPassword && currentPassword === newPassword) {
+    errors.newPassword = "현재 비밀번호와 다른 새 비밀번호를 입력해주세요.";
+  }
+
+  return errors;
+};

@@ -5,6 +5,7 @@ import {
   getMySubmission,
   submitAssignment,
   resubmitAssignment,
+  deleteSubmission,
   getSubmissionAttachmentDownloadUrl,
   deleteSubmissionAttachment,
   deleteAssignment,
@@ -19,7 +20,7 @@ import "./AssignmentDetailPage.css";
 import "./AdminWritePage.css";
 
 /**
- * 과제 상세 + 제출/재제출. 명세서 24/28/30/31/32/33번 API 연동.
+ * 과제 상세 + 제출/재제출. 명세서 24/28/30/31/32/33/34번 API 연동.
  *
  * 파일 첨부 업로드(32/33번의 files 파트)까지 연동한다. 백엔드는 최대 5개, 개당 50MB,
  * 총 100MB까지 지원한다(SubmissionService 기준).
@@ -30,6 +31,9 @@ import "./AdminWritePage.css";
  * 불가능하므로(다운로드 URL만 있음), 기존 파일을 유지하고 싶으면 재제출할 때 로컬에서
  * 다시 선택해서 첨부해야 한다 — 이 사실을 재제출 폼에 안내 문구로 명시한다.
  * 파일 하나만 떼고 싶을 때는 전체 재제출 대신 개별 삭제(DELETE .../submission-attachments/{id})를 쓴다.
+ *
+ * 제출물 자체(텍스트+파일 전부)를 지워 "제출 안 한 상태"로 되돌리고 싶을 때는 34번 API
+ * (DELETE .../submission)를 쓴다 — 파일 개별 삭제와는 별개 동작이다.
  *
  * 참고 첨부파일(관리자가 과제 등록/수정 화면에서 미리 올려두는 안내 파일, 명세서 28/29/30번)은
  * 학생이 제출할 때 같이 올리는 제출 첨부파일과 완전히 다른 목록이다 — 여기 assignment.attachments가
@@ -57,6 +61,7 @@ function AssignmentDetailPage() {
   const [submitError, setSubmitError] = useState("");
   const [deletingAttachmentId, setDeletingAttachmentId] = useState(null);
   const [deletingRefAttachmentId, setDeletingRefAttachmentId] = useState(null);
+  const [isDeletingSubmission, setIsDeletingSubmission] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setIsLoading(true);
@@ -187,6 +192,25 @@ function AssignmentDetailPage() {
     }
   };
 
+  // 제출물(텍스트+첨부파일 전부)을 통째로 지워 "제출 안 한 상태"로 되돌린다 (명세서 34번).
+  // 파일 하나만 지우는 handleDeleteFile과는 다른 API(DELETE .../submission)를 쓴다.
+  const handleDeleteSubmission = async () => {
+    if (!window.confirm("제출물을 전체 삭제할까요? 텍스트와 첨부파일이 모두 삭제되며 되돌릴 수 없습니다."))
+      return;
+    setIsDeletingSubmission(true);
+    try {
+      await deleteSubmission(assignmentId);
+      setSubmission(null);
+      setEditing(false);
+      resetFileSelection();
+      await fetchAll();
+    } catch (err) {
+      alert(err.message ?? "제출물 삭제에 실패했습니다.");
+    } finally {
+      setIsDeletingSubmission(false);
+    }
+  };
+
   const handleDownloadRefAttachment = async (attachmentId) => {
     try {
       const { downloadUrl } = await getAssignmentAttachmentDownloadUrl(attachmentId);
@@ -310,9 +334,19 @@ function AssignmentDetailPage() {
                   {formatDateTime(submission.updatedAt ?? submission.createdAt)}
                 </span>
                 {canModify && (
-                  <button type="button" className="assignment-btn assignment-btn--ghost" onClick={startResubmit}>
-                    재제출
-                  </button>
+                  <div className="assignment-receipt__actions">
+                    <button type="button" className="assignment-btn assignment-btn--ghost" onClick={startResubmit}>
+                      재제출
+                    </button>
+                    <button
+                      type="button"
+                      className="assignment-btn assignment-btn--danger"
+                      onClick={handleDeleteSubmission}
+                      disabled={isDeletingSubmission}
+                    >
+                      {isDeletingSubmission ? "삭제 중..." : "제출물 전체 삭제"}
+                    </button>
+                  </div>
                 )}
               </div>
               <p className="assignment-receipt__text">{submission.textContent || "(내용 없음)"}</p>

@@ -21,13 +21,13 @@ function Header() {
       </Link>
 
       <div className="app-header__user">
-        <div className="app-header__identity">
+        <Link to="/mypage" className="app-header__identity" aria-label="마이페이지로 이동">
           <div className="app-header__avatar">{initial}</div>
           <div>
             <div className="app-header__name">{user?.name}</div>
             <div className="app-header__sub">{user?.studentNumber}</div>
           </div>
-        </div>
+        </Link>
         <button type="button" className="app-header__logout" onClick={logout}>
           로그아웃
         </button>

@@ -114,6 +114,17 @@ export const resubmitAssignment = async (assignmentId, { textContent, files = []
 };
 
 /**
+ * 제출물 전체 삭제 (텍스트 + 첨부파일 전부)
+ * DELETE /api/v1/assignments/{assignmentId}/submission
+ * 파일 하나만 뗄 때는 deleteSubmissionAttachment를 쓰고, 텍스트/파일을 통째로 지워
+ * "제출 안 한 상태"로 되돌릴 때만 이 함수를 쓴다 (명세서 34번).
+ * @param {number|string} assignmentId
+ */
+export const deleteSubmission = async (assignmentId) => {
+  await axiosInstance.delete(`/api/v1/assignments/${assignmentId}/submission`);
+};
+
+/**
  * 제출 파일 개별 삭제 (전체 재제출 없이 파일 하나만 뗄 때)
  * DELETE /api/v1/submission-attachments/{attachmentId}
  * 본인 제출물만 가능하고, 마감 후 지각 제출 불가 과제면 막힌다(백엔드 determineLateAndRequireEditable).

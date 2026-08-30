@@ -16,6 +16,11 @@ const AuthContext = createContext(null);
  *
  * isLoading이 true인 동안은 "로그인 상태를 확인 중"이라는 뜻이므로,
  * 이 시점에 섣불리 /login으로 리다이렉트하면 안 된다 (ProtectedRoute에서 사용).
+ *
+ * ⚠️ user.id 필드 통일: 로그인 응답(POST /auth/login, 명세서 2번)은 memberId를 내려주고,
+ * 내 정보 조회 응답(GET /members/me, 명세서 4번)은 id를 내려준다 — 명세서 자체가 서로 다른
+ * 키를 쓴다. 화면 코드에서 "이 user가 로그인 직후 온 건지 새로고침 복원인지"에 따라 다른
+ * 필드를 참조하는 실수를 막기 위해, login() 시점에 id로 정규화해서 저장한다.
  */
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null); // { id, studentNumber, name, role, status }
@@ -46,12 +51,23 @@ function AuthProvider({ children }) {
     restoreSession();
   }, []);
 
-  // 로그인 성공 직후 LoginPage에서 호출 — 서버 응답으로 받은 사용자 정보를 컨텍스트에 반영
+  // 로그인 성공 직후 LoginPage에서 호출 — 서버 응답으로 받은 사용자 정보를 컨텍스트에 반영.
+  // userInfo는 로그인 응답(memberId 필드)을 그대로 받으므로 id로 정규화해서 저장한다.
   const login = useCallback((accessToken, userInfo) => {
+    const normalized = {
+      ...userInfo,
+      id: userInfo.id ?? userInfo.memberId,
+    };
     localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("memberId", userInfo.memberId ?? userInfo.id);
-    localStorage.setItem("role", userInfo.role);
-    setUser(userInfo);
+    localStorage.setItem("memberId", normalized.id);
+    localStorage.setItem("role", normalized.role);
+    setUser(normalized);
+  }, []);
+
+  // 마이페이지에서 이름 수정 등 내 정보 일부가 바뀌었을 때, 재로그인/새로고침 없이
+  // 헤더 등 다른 화면에 즉시 반영되도록 컨텍스트의 user를 부분 갱신한다.
+  const updateUser = useCallback((partial) => {
+    setUser((prev) => (prev ? { ...prev, ...partial } : prev));
   }, []);
 
   const logout = useCallback(async () => {
@@ -73,6 +89,7 @@ function AuthProvider({ children }) {
     isLoading,
     login,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

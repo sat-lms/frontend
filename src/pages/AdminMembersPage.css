@@ -1,0 +1,91 @@
+/*
+ * 회원 관리 화면 전용 스타일.
+ * 기존 관리자 화면(AdminApprovalsPage.css, AdminSubmissionsPage.css) 톤과 동일한 디자인 토큰을 재사용한다.
+ */
+
+.admin-members__status-select {
+  padding: 10px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #333333;
+  background: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.admin-members__status-select:focus {
+  border-color: #002968;
+  box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
+}
+
+.admin-members__badge {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+}
+
+.admin-members__badge--admin {
+  background: #eef2f8;
+  color: #002968;
+}
+
+.admin-members__badge--student {
+  background: #f0f0f0;
+  color: #555555;
+}
+
+.admin-members__badge--status-pending {
+  background: #fff3e0;
+  color: #c97a1d;
+}
+
+.admin-members__badge--status-approved {
+  background: #e7f7ee;
+  color: #1f9254;
+}
+
+.admin-members__badge--status-rejected {
+  background: #fdebec;
+  color: #c23b3b;
+}
+
+.admin-members__badge--status-withdrawn {
+  background: #f0f0f0;
+  color: #9ca3af;
+}
+
+.admin-members-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.admin-members-detail__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-members-detail__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.admin-members-detail__row span {
+  color: #7a7a7a;
+  flex-shrink: 0;
+}
+
+.admin-members-detail__row strong {
+  font-weight: 600;
+  color: #1d1d1f;
+  text-align: right;
+}

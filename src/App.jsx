@@ -10,8 +10,10 @@ import AssignmentListPage from "./pages/AssignmentListPage";
 import AssignmentDetailPage from "./pages/AssignmentDetailPage";
 import AdminApprovalsPage from "./pages/AdminApprovalsPage";
 import AdminSubmissionsPage from "./pages/AdminSubmissionsPage";
+import AdminMembersPage from "./pages/AdminMembersPage";
 import NoticeWritePage from "./pages/NoticeWritePage";
 import AssignmentWritePage from "./pages/AssignmentWritePage";
+import MyPage from "./pages/MyPage";
 
 function App() {
   return (
@@ -26,6 +28,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mypage"
+            element={
+              <ProtectedRoute>
+                <MyPage />
               </ProtectedRoute>
             }
           />
@@ -67,6 +77,14 @@ function App() {
             element={
               <ProtectedRoute role="ADMIN">
                 <AdminApprovalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/members"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AdminMembersPage />
               </ProtectedRoute>
             }
           />
