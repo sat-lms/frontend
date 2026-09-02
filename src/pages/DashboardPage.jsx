@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getNotices, getUnreadNoticeCount } from "../api/noticeApi";
-import { getAssignments, getMySubmissions } from "../api/assignmentApi";
+import { getAssignments } from "../api/assignmentApi";
 import { getMemberApplications } from "../api/adminMemberApi";
 import AppLayout from "../components/AppLayout";
 import "./DashboardPage.css";
 
 const RECENT_NOTICES_SIZE = 5;
 const UPCOMING_ASSIGNMENTS_LIMIT = 5;
-// 다가오는 과제를 계산하려면 전체 과제/제출 내역이 필요하다. 다른 화면(AssignmentListPage 등)과
+// 다가오는 과제를 계산하려면 전체 과제 목록이 필요하다. 다른 화면(AssignmentListPage 등)과
 // 동일하게 데이터가 아주 많지는 않을 거라 보고 한 번에 넉넉히 가져와 클라이언트에서 계산한다.
 const FETCH_ALL_SIZE = 200;
 
@@ -51,23 +51,23 @@ function DashboardPage() {
     }
   }, []);
 
+  // "다가오는 과제"는 GET /api/v1/assignments가 STUDENT 조회 시 함께 내려주는
+  // submissionStatus로 계산한다. IN_PROGRESS는 "아직 제출 안 했지만 제출 가능한" 과제를
+  // 뜻하고, 마감이 지났어도 지각 제출이 허용되면 여기 포함되므로 기존에 프론트에서 직접
+  // 계산하던 "미제출 + (마감 전이거나 지각 허용)" 조건과 동일하다.
+  //
+  // 예전에는 GET /api/v1/members/me/submissions를 별도로 불러와 제출된 assignmentId를
+  // 걸러내는 방식이었는데, 그 API가 기본적으로 "내가 제출한 것만" 내려준다는 전제로 짜여
+  // 있어서 — 이제 미제출 과제까지 함께 내려오도록 API가 바뀌면서 모든 과제가 "제출됨"으로
+  // 걸러져 이 위젯이 항상 빈 목록으로 나오는 문제가 있었다. 백엔드가 이미 계산해서 내려주는
+  // 상태를 그대로 쓰는 것으로 바꿔서 이 문제와 중복 계산 로직을 함께 제거했다.
   const fetchUpcomingAssignments = useCallback(async () => {
     if (isAdmin) return;
     setAssignmentsLoading(true);
     try {
-      const [assignmentsData, submissionsData] = await Promise.all([
-        getAssignments({ page: 0, size: FETCH_ALL_SIZE }),
-        getMySubmissions({ page: 0, size: FETCH_ALL_SIZE }),
-      ]);
+      const assignmentsData = await getAssignments({ page: 0, size: FETCH_ALL_SIZE });
       const assignments = Array.isArray(assignmentsData) ? assignmentsData : assignmentsData.content ?? [];
-      const submissions = Array.isArray(submissionsData) ? submissionsData : submissionsData.content ?? [];
-      const submittedIds = new Set(submissions.map((s) => s.assignmentId));
-
-      const notSubmitted = assignments.filter((a) => !submittedIds.has(a.assignmentId));
-      const stillOpen = notSubmitted.filter((a) => {
-        const isPastDue = !!a.dueAt && new Date() > new Date(a.dueAt);
-        return !isPastDue || a.allowLateSubmission;
-      });
+      const stillOpen = assignments.filter((a) => a.submissionStatus === "IN_PROGRESS");
       stillOpen.sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt));
       setUpcoming(stillOpen.slice(0, UPCOMING_ASSIGNMENTS_LIMIT));
     } catch {
