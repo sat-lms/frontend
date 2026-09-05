@@ -16,6 +16,7 @@ import {
 import { getAssignmentAttachmentDownloadUrl, deleteAssignmentAttachment } from "../api/assignmentAttachmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
+import SubmissionComments from "../components/SubmissionComments";
 import "./AssignmentDetailPage.css";
 import "./AdminWritePage.css";
 
@@ -40,6 +41,10 @@ import "./AdminWritePage.css";
  * 참고 첨부, submission.files가 제출 첨부. 업로드/삭제는 관리자 전용이라 과제 등록/수정 화면
  * (AssignmentWritePage)에서 하고, 이 상세 화면에서는 모두에게 다운로드만 보여주고 관리자에게만
  * 삭제 버튼도 함께 보여준다(수정 화면까지 안 가도 바로 뗄 수 있게).
+ *
+ * 제출물 댓글(피드백, GitHub 이슈 #96/PR #100)은 제출이 완료된 뒤에만 의미가 있는 기능이라
+ * showReceipt(제출 완료 상태) 블록 안에만 넣는다 — 제출 전 폼 화면(showForm)에는 넣지 않는다.
+ * 팀 논의에서도 "제출 화면에는 굳이 없어도 되지 않나"로 정리됐다.
  */
 function AssignmentDetailPage() {
   const { assignmentId } = useParams();
@@ -381,6 +386,8 @@ function AssignmentDetailPage() {
                   </div>
                 </div>
               )}
+
+              <SubmissionComments submissionId={submission.submissionId} />
             </div>
           )}
 

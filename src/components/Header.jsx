@@ -9,6 +9,11 @@ import "./Header.css";
  *
  * 좌측 햄버거 버튼은 AppLayout이 들고 있는 사이드바 열림 상태를 토글한다 — 사이드바는
  * 평소엔 숨어 있다가 이 버튼을 누르면 드로어로 펼쳐지는 방식이다.
+ *
+ * 로고 옆 "SAT-LMS / Software Architect Team" 워드마크: 로그인 화면(BrandPanel)에는
+ * 이미 같은 팀명 브랜딩이 큼직하게 들어가 있는데, 로그인 이후 헤더는 "SAT" 로고 박스 하나뿐이라
+ * 로고와 우측 사용자 정보 사이 공간이 휑하다는 피드백이 있었다. 그 사이를 채우면서 로그인
+ * 화면과 브랜드 톤을 맞추기 위해 같은 팀명 워드마크를 작게 넣었다.
  */
 function Header({ onMenuToggle }) {
   const { user, logout } = useAuth();
@@ -33,6 +38,10 @@ function Header({ onMenuToggle }) {
             "관리자"인 경우처럼 오른쪽과 문구가 겹쳐 보여 좌측 라벨은 제거했다. */}
         <Link to="/" className="app-header__brand" aria-label="홈으로 이동">
           <div className="app-header__logo">SAT</div>
+          <div className="app-header__wordmark">
+            <span className="app-header__wordmark-title">SAT-LMS</span>
+            <span className="app-header__wordmark-sub">Software Architect Team</span>
+          </div>
         </Link>
       </div>
 

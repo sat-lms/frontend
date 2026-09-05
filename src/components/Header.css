@@ -61,6 +61,44 @@
   letter-spacing: 0.5px;
 }
 
+/* 로고 옆 팀명 워드마크. 로그인 화면(BrandPanel)의 "SAT-LMS" 워드마크와 같은 브랜드 톤을
+   헤더에도 작게 가져와, 로고와 우측 사용자 정보 사이의 빈 공간을 채운다. 화면이 좁아지면
+   (사이드바 토글 버튼 + 로고만으로도 이미 빡빡해지는 모바일 폭) 부제는 먼저 숨기고,
+   더 좁아지면 워드마크 전체를 숨겨 로고만 남긴다 — app-header__user와 겹치지 않도록.*/
+.app-header__wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.app-header__wordmark-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.app-header__wordmark-sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a9c0e8;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .app-header__wordmark-sub {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-header__wordmark {
+    display: none;
+  }
+}
+
 .app-header__user {
   display: flex;
   align-items: center;

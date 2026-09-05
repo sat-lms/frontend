@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getAssignments, getSubmissionAttachmentDownloadUrl } from "../api/assignmentApi";
 import { getAssignmentSubmissionStatus, getAdminSubmissionDetail } from "../api/adminSubmissionApi";
 import AppLayout from "../components/AppLayout";
+import SubmissionComments from "../components/SubmissionComments";
 import "./AdminWritePage.css";
 import "./AdminSubmissionsPage.css";
 
@@ -20,6 +21,10 @@ const STATUS_TABS = [
  * 과제별 제출 현황. 명세서 37/38번 API 연동.
  * GET /api/v1/admin/assignments/{assignmentId}/submissions (제출/미제출/지각 카운트 + 학생별 상태 목록) +
  * GET /api/v1/admin/submissions/{submissionId} (제출물 상세 - 모달로 표시).
+ *
+ * 제출물 상세 모달에 댓글(피드백, GitHub 이슈 #96/PR #100) 섹션도 함께 보여준다 — 관리자가
+ * 제출물을 열람하는 화면이 곧 "이미 제출이 존재하는" 화면이라 댓글 기능의 전제 조건과 맞는다.
+ * 모달을 열 때 이미 detailSubmissionId로 어떤 제출물인지 알고 있으므로 그대로 넘긴다.
  */
 function AdminSubmissionsPage() {
   const [assignments, setAssignments] = useState([]);
@@ -278,6 +283,8 @@ function AdminSubmissionsPage() {
                     </div>
                   </>
                 )}
+
+                <SubmissionComments submissionId={detailSubmissionId} />
               </>
             )}
           </div>
