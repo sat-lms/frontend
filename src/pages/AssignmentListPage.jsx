@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { getAssignments, getMySubmissions } from "../api/assignmentApi";
+import { getAssignments } from "../api/assignmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./AssignmentListPage.css";
@@ -10,9 +10,6 @@ import "./AdminWritePage.css";
 import "./AdminSubmissionsPage.css";
 
 const PAGE_SIZE = 10;
-// 과제 목록과 별개로 "내 제출 내역"을 한 번에 가져와 과제별 상태를 계산한다.
-// 학생 한 명의 전체 제출 건수가 아주 많지는 않을 거라 보고 넉넉하게 잡았다 (N+1 조회 방지).
-const SUBMISSIONS_FETCH_SIZE = 200;
 // 제출완료/미제출/지각제출 통계와 상태 필터 탭을 정확히 계산하려면 페이지 단위가 아니라
 // 전체 과제 목록이 필요하다. 백엔드에 검색어 파라미터도 없어서 어차피 넉넉히 한 번에 받아
 // 클라이언트에서 검색/필터/페이지네이션을 모두 처리한다.
@@ -35,9 +32,15 @@ const STATUS_TABS = [
 /**
  * 과제 목록. 명세서 23번 API(GET /api/v1/assignments) 연동.
  *
- * 백엔드가 과제 목록 응답에 "내 제출 상태"를 함께 내려주지 않기 때문에(N+1 방지 목적으로
- * 의도적으로 분리된 설계), 내 제출 내역 목록(GET /api/v1/members/me/submissions)을 같이 불러와서
- * assignmentId 기준으로 매칭해 상태 배지(진행중/제출완료/지각제출/마감)를 클라이언트에서 계산한다.
+ * 백엔드가 STUDENT로 조회할 때 과제 항목마다 내 제출 상태(submissionStatus: IN_PROGRESS /
+ * NOT_SUBMITTED / SUBMITTED / LATE)를 함께 내려주므로, 상태 배지(진행중/제출완료/지각제출/마감)는
+ * 이 값을 그대로 매핑해서 쓴다. 예전에는 GET /api/v1/members/me/submissions를 별도로 불러와
+ * assignmentId 기준으로 매칭해 프론트에서 직접 계산했는데, 그 방식은 해당 API가 기본적으로
+ * "내가 제출한 것만" 내려준다는 전제로 짜여 있어서 — 이제 미제출 과제까지 함께 내려오도록
+ * API가 바뀌면서 모든 과제가 항상 "제출완료"로 잘못 표시되는 문제가 있었다. 백엔드가 이미
+ * 계산해서 내려주는 상태를 그대로 쓰는 것으로 바꿔서 이 문제와 중복 계산 로직을 함께 제거했다.
+ * ADMIN으로 조회하면 submissionStatus가 null로 내려오므로, 관리자 화면에서는 마감 여부만으로
+ * 배지를 계산한다(관리자는 제출자가 아니라 개인 제출 상태가 없기 때문).
  *
  * 학생 화면에서는 "어떤 과제를 제출했고 어떤 과제를 안 냈는지"를 한눈에 볼 수 있도록
  * 제출완료/미제출/지각제출 통계 타일과 상태 필터 탭을 추가로 보여준다(AdminSubmissionsPage의
@@ -50,7 +53,6 @@ function AssignmentListPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
   const [assignments, setAssignments] = useState([]);
-  const [submissionByAssignmentId, setSubmissionByAssignmentId] = useState({});
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,33 +74,17 @@ function AssignmentListPage() {
     setIsLoading(true);
     setError("");
     try {
-      // 내 제출 내역(GET /members/me/submissions)은 백엔드가 학생 전용으로 제한한다(requireStudent).
-      // 관리자 계정으로 호출하면 403이 나므로, 관리자일 때는 아예 호출하지 않는다
-      // (관리자 화면에서는 개인 제출 상태 배지 대신 마감 여부만 보여준다).
-      const [assignmentsData, submissionsData] = await Promise.all([
-        getAssignments({ page: 0, size: FETCH_ALL_SIZE }),
-        isAdmin ? Promise.resolve({ content: [] }) : getMySubmissions({ page: 0, size: SUBMISSIONS_FETCH_SIZE }),
-      ]);
-
+      const assignmentsData = await getAssignments({ page: 0, size: FETCH_ALL_SIZE });
       // 공지 목록과 마찬가지로 응답이 배열 단독인지 페이지네이션 객체인지
       // 백엔드와 확정되지 않아 둘 다 방어적으로 처리한다.
       const list = Array.isArray(assignmentsData) ? assignmentsData : assignmentsData.content ?? [];
       setAssignments(list);
-
-      const submissionsList = Array.isArray(submissionsData)
-        ? submissionsData
-        : submissionsData.content ?? [];
-      const map = {};
-      submissionsList.forEach((s) => {
-        map[s.assignmentId] = s;
-      });
-      setSubmissionByAssignmentId(map);
     } catch (err) {
       setError(err.message ?? "과제 목록을 불러오지 못했습니다.");
     } finally {
       setIsLoading(false);
     }
-  }, [isAdmin]);
+  }, []);
 
   useEffect(() => {
     fetchAssignments();
@@ -107,12 +93,11 @@ function AssignmentListPage() {
   // 과제별 상태 배지 + 필터 탭용 상태 키(submitted/late/not_submitted)를 한 번에 계산한다.
   const categorized = useMemo(() => {
     return assignments.map((a) => {
-      const submission = submissionByAssignmentId[a.assignmentId];
-      const meta = resolveStatusMeta(a, submission);
-      const statusKey = submission ? (submission.isLate ? "late" : "submitted") : "not_submitted";
+      const meta = resolveStatusMeta(a);
+      const statusKey = resolveStatusKey(a);
       return { ...a, meta, statusKey };
     });
-  }, [assignments, submissionByAssignmentId]);
+  }, [assignments]);
 
   // 통계 타일은 검색어와 무관하게 "전체 과제 기준" 현황을 보여준다.
   const stats = useMemo(() => {
@@ -254,15 +239,32 @@ function AssignmentListPage() {
   );
 }
 
-function resolveStatusMeta(assignment, submission) {
-  if (submission) {
-    return submission.isLate ? STATUS_META.late : STATUS_META.submitted;
+// 관리자 조회는 submissionStatus가 내려오지 않으므로(null), 마감 여부만으로 배지를 계산한다.
+function resolveStatusMeta(assignment) {
+  switch (assignment.submissionStatus) {
+    case "SUBMITTED":
+      return STATUS_META.submitted;
+    case "LATE":
+      return STATUS_META.late;
+    case "IN_PROGRESS":
+      return STATUS_META.progress;
+    case "NOT_SUBMITTED":
+      return STATUS_META.closed;
+    default: {
+      const isPastDue = !!assignment.dueAt && new Date() > new Date(assignment.dueAt);
+      if (isPastDue && !assignment.allowLateSubmission) {
+        return STATUS_META.closed;
+      }
+      return STATUS_META.progress;
+    }
   }
-  const isPastDue = !!assignment.dueAt && new Date() > new Date(assignment.dueAt);
-  if (isPastDue && !assignment.allowLateSubmission) {
-    return STATUS_META.closed;
-  }
-  return STATUS_META.progress;
+}
+
+// 통계 타일/필터 탭은 "제출완료" / "지각제출" / "미제출"(진행중 + 마감을 합친 것) 세 갈래만 구분한다.
+function resolveStatusKey(assignment) {
+  if (assignment.submissionStatus === "SUBMITTED") return "submitted";
+  if (assignment.submissionStatus === "LATE") return "late";
+  return "not_submitted";
 }
 
 function formatDateTime(isoString) {

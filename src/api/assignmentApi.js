@@ -3,10 +3,15 @@ import axiosInstance from "./axiosInstance";
 /**
  * 과제 목록 조회
  * GET /api/v1/assignments
- * 백엔드 AssignmentListResponse에는 마감일시(dueAt)/지각허용여부(allowLateSubmission)만 있고
- * "내 제출 상태"는 내려주지 않는다 (N+1을 피하려면 getMySubmissions와 조합해서 클라이언트에서 계산해야 함).
+ * STUDENT로 조회하면 각 과제 항목에 내 제출 상태(submissionStatus)가 함께 내려온다:
+ *   - IN_PROGRESS: 미제출이지만 아직 제출 가능 (마감이 지났어도 지각 제출이 허용되면 여기 포함)
+ *   - NOT_SUBMITTED: 미제출이고 마감됐으며 지각 제출도 불가능
+ *   - SUBMITTED: 정상 제출 완료
+ *   - LATE: 지각 제출 완료
+ * ADMIN으로 조회하면 submissionStatus는 null이다(관리자는 제출자가 아니므로 개인 제출 상태가 없음).
+ * 기존 정렬 형식은 그대로 유지된다.
  * @param {{ page?: number, size?: number }} params
- * @returns {Promise<{ content: Array<{ assignmentId: number, title: string, dueAt: string, allowLateSubmission: boolean }>, totalPages: number }>}
+ * @returns {Promise<{ content: Array<{ assignmentId: number, title: string, dueAt: string, allowLateSubmission: boolean, submissionStatus: "IN_PROGRESS" | "NOT_SUBMITTED" | "SUBMITTED" | "LATE" | null }>, totalPages: number }>}
  */
 export const getAssignments = async (params = {}) => {
   const { data } = await axiosInstance.get("/api/v1/assignments", { params });
@@ -44,12 +49,28 @@ export const getMySubmission = async (assignmentId) => {
 };
 
 /**
- * 내 제출 내역 목록 조회 (모든 과제에 대한 제출 이력, created_at 내림차순 고정 정렬)
+ * 내 제출 내역 목록 조회
  * GET /api/v1/members/me/submissions
- * 과제 목록 화면에서 과제별 제출 상태 배지(제출완료/지각제출/진행중/마감)를 계산하려고 쓴다.
- * 학생 한 명의 과제 수가 아주 많지는 않을 거라 가정하고 size를 넉넉하게 잡아 한 번에 가져온다.
- * @param {{ page?: number, size?: number }} params
- * @returns {Promise<{ content: Array<{ submissionId: number, assignmentId: number, assignmentTitle: string, textContent: string, isLate: boolean, createdAt: string, updatedAt: string }>, totalPages: number }>}
+ *
+ * includeNotSubmitted 기본값이 true라 미제출 과제도 함께 내려온다(false로 보내면 예전처럼
+ * 내가 실제로 제출한 과제만 조회됨). 미제출 항목은 submissionId가 null이고 submittedAt /
+ * textContent / createdAt / updatedAt도 null, attachments / fileNames는 빈 배열, isLate는
+ * false로 내려온다 — 목록 항목을 식별할 때는 submissionId가 아니라 assignmentId를 쓰고,
+ * submissionId가 없는 항목에는 제출물 조회·삭제 같은 동작을 연결하면 안 된다.
+ *
+ * submissionStatus: IN_PROGRESS(미제출·제출가능, 마감이 지났어도 지각 제출이 가능하면 포함) /
+ * NOT_SUBMITTED(미제출·마감·지각불가) / SUBMITTED(정상 제출) / LATE(지각 제출).
+ *
+ * sort: dueAtDesc(기본) / dueAtAsc / submittedAtDesc(마지막 제출·재제출 시각 내림차순, 미제출은 맨 뒤)
+ * 예: ?includeNotSubmitted=true&sort=dueAtAsc&page=0&size=20
+ *
+ * 참고: 과제 목록 화면(AssignmentListPage)과 대시보드의 "다가오는 과제" 위젯(DashboardPage)은
+ * 이제 GET /api/v1/assignments가 함께 내려주는 submissionStatus로 과제별 상태를 바로 계산하므로
+ * 이 함수를 호출하지 않는다(백엔드가 이미 계산해 주는 상태를 프론트에서 다시 계산하던 중복 로직을
+ * 제거했다). 개인 제출 이력만 별도로 나열하는 화면이 새로 생기면 그때 이 함수를 사용한다.
+ *
+ * @param {{ page?: number, size?: number, includeNotSubmitted?: boolean, sort?: "dueAtDesc" | "dueAtAsc" | "submittedAtDesc" }} params
+ * @returns {Promise<{ content: Array<{ submissionId: number | null, assignmentId: number, assignmentTitle: string, dueAt: string, textContent: string | null, isLate: boolean, submittedAt: string | null, createdAt: string | null, updatedAt: string | null, fileNames: string[], attachments: Array<Object>, submissionStatus: "IN_PROGRESS" | "NOT_SUBMITTED" | "SUBMITTED" | "LATE" }>, totalPages: number }>}
  */
 export const getMySubmissions = async (params = {}) => {
   const { data } = await axiosInstance.get("/api/v1/members/me/submissions", { params });
