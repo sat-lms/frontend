@@ -41,10 +41,15 @@ export const changeMyPassword = async ({ currentPassword, newPassword, newPasswo
 /**
  * 회원 탈퇴 — 물리 삭제가 아니라 member.status를 WITHDRAWN으로 변경한다 (제출 기록은 유지).
  * DELETE /api/v1/members/me
- * axios는 DELETE에 바디를 실으려면 config.data로 넘겨야 한다.
- * @param {{ password: string }} payload
+ * axios는 DELETE에 바디를 실으려면 config.data로 넘겨야 한다(이미 그렇게 하고 있었음).
+ *
+ * ⚠️ GitHub PR #99(이슈 #98, "비밀번호 재확인 기반 자진 회원탈퇴") diff를 직접 확인해서 맞췄다:
+ * 요청 바디 필드명이 password가 아니라 currentPassword다(MemberWithdrawalRequest.java,
+ * @NotBlank currentPassword). 예전에 password로 보내고 있어서 매번 400(현재 비밀번호를
+ * 입력해주세요)이 났었다 — 실제로는 axios data 래핑 문제가 아니라 필드명 불일치였다.
+ * @param {{ currentPassword: string }} payload
  */
-export const withdrawMe = async ({ password }) => {
-  const { data } = await axiosInstance.delete("/api/v1/members/me", { data: { password } });
+export const withdrawMe = async ({ currentPassword }) => {
+  const { data } = await axiosInstance.delete("/api/v1/members/me", { data: { currentPassword } });
   return data;
 };

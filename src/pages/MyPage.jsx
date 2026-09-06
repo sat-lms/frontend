@@ -122,7 +122,9 @@ function MyPage() {
 
     setIsWithdrawing(true);
     try {
-      await withdrawMe({ password: withdrawPassword });
+      // 백엔드(MemberWithdrawalRequest)가 요구하는 필드명은 currentPassword다 — password로
+      // 보내면 @NotBlank currentPassword 검증에 걸려 항상 400이 난다 (PR #99 diff로 확인).
+      await withdrawMe({ currentPassword: withdrawPassword });
       await logout();
       navigate("/login", { replace: true, state: { message: "탈퇴가 완료되었습니다." } });
     } catch (err) {
