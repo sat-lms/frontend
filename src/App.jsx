@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
+import ReactivationPage from "./pages/ReactivationPage";
 import DashboardPage from "./pages/DashboardPage";
 import NoticeListPage from "./pages/NoticeListPage";
 import NoticeDetailPage from "./pages/NoticeDetailPage";
@@ -22,6 +23,7 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reactivate" element={<ReactivationPage />} />
 
           <Route
             path="/"

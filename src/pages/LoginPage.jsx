@@ -23,6 +23,11 @@ function LoginPage() {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // WITHDRAWN 상태로 로그인이 막힌 경우에만 "계정 복구 신청" 링크를 추가로 보여준다.
+  // PR #107(계정 복구)이 자진 탈퇴 계정만 지원하므로, 관리자 추방으로 WITHDRAWN이 된
+  // 계정이 이 링크를 눌러 신청해도 백엔드가 401로 막는다 — 프론트에서는 이 둘을 구분할
+  // 방법이 없어서(로그인 응답에 탈퇴 사유가 안 내려옴) 일단 링크는 공통으로 보여준다.
+  const [isWithdrawn, setIsWithdrawn] = useState(false);
 
   const infoMessage = location.state?.message;
 
@@ -35,6 +40,7 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
+    setIsWithdrawn(false);
 
     const validationErrors = getLoginErrors(form);
     if (Object.keys(validationErrors).length > 0) {
@@ -65,6 +71,7 @@ function LoginPage() {
         // 백엔드가 status(PENDING/REJECTED/WITHDRAWN)를 함께 내려주는 경우
         const status = err.raw.response.data.status;
         setSubmitError(STATUS_MESSAGE[status] ?? err.message);
+        setIsWithdrawn(status === "WITHDRAWN");
       } else {
         setSubmitError(err.message ?? "로그인에 실패했습니다. 다시 시도해주세요.");
       }
@@ -111,7 +118,17 @@ function LoginPage() {
             {errors.password && <span className="field-error">{errors.password}</span>}
           </div>
 
-          {submitError && <p className="submit-error">{submitError}</p>}
+          {submitError && (
+            <p className="submit-error">
+              {submitError}
+              {isWithdrawn && (
+                <>
+                  {" "}
+                  <Link to="/reactivate">계정 복구 신청하기 →</Link>
+                </>
+              )}
+            </p>
+          )}
 
           <button type="submit" className="auth-submit" disabled={isSubmitting}>
             {isSubmitting ? "로그인 중..." : "로그인"}
@@ -119,6 +136,8 @@ function LoginPage() {
 
           <p className="auth-switch">
             계정이 없나요? <Link to="/signup">회원가입</Link>
+            {" · "}
+            <Link to="/reactivate">탈퇴 계정 복구</Link>
           </p>
         </form>
       </div>

@@ -65,3 +65,25 @@ export const getPasswordChangeErrors = ({ currentPassword, newPassword, newPassw
 
   return errors;
 };
+
+// 계정 복구 신청(POST /api/v1/auth/reactivation-requests, PR #107/이슈 #106) 사전 검증.
+// ⚠️ currentPassword는 "새로 만드는" 비밀번호가 아니라 탈퇴 전에 쓰던 기존 비밀번호를 그대로
+// 입력받는 것이므로, isValidPassword(8자+영문+숫자) 형식 검증을 걸면 안 된다 — 백엔드도
+// @NotBlank + 72바이트 이하만 검증한다(MemberWithdrawalRequest/ReactivationRequest 공통 톤).
+export const getReactivationErrors = ({ studentNumber, currentPassword, passwordConfirm }) => {
+  const errors = {};
+
+  if (!isValidStudentNumber(studentNumber)) {
+    errors.studentNumber = "학번은 숫자 8~10자리로 입력해주세요.";
+  }
+  if (!currentPassword) {
+    errors.currentPassword = "탈퇴 전 사용하던 비밀번호를 입력해주세요.";
+  }
+  if (!passwordConfirm) {
+    errors.passwordConfirm = "비밀번호 확인을 입력해주세요.";
+  } else if (currentPassword && currentPassword !== passwordConfirm) {
+    errors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
+  }
+
+  return errors;
+};

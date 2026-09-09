@@ -16,6 +16,12 @@ const STATUS_TABS = [
  * 회원가입 승인 목록. 명세서 8/9/10번 API 연동.
  * GET /api/v1/admin/member-applications (status별 조회) +
  * PATCH /api/v1/admin/member-applications/{memberId} (승인/거절).
+ *
+ * ⚠️ GitHub PR #107(이슈 #106, "탈퇴 회원 계정 복구")부터는 자진 탈퇴했던 회원이
+ * /reactivate 화면에서 복구를 신청해도 정확히 이 목록(같은 GET/PATCH 엔드포인트)에
+ * PENDING 상태로 함께 뜬다 — 신규 가입 신청과 복구 신청을 구분해서 보여줄 방법이
+ * 현재 API 응답에는 없다(PR #107 diff 확인: 구분 필드 없음). 그래서 이름/학번이 낯익은
+ * 항목이 있으면 예전에 탈퇴했던 학생의 복구 신청일 수 있다는 점을 감안해서 검토해야 한다.
  */
 function AdminApprovalsPage() {
   const [status, setStatus] = useState("PENDING");
@@ -84,7 +90,9 @@ function AdminApprovalsPage() {
   return (
     <AppLayout>
       <h1 className="page-title">회원가입 승인</h1>
-      <p className="page-subtitle">신규 가입 신청을 검토하고 승인 또는 거절하세요</p>
+      <p className="page-subtitle">
+        신규 가입 신청과 탈퇴 회원의 계정 복구 신청을 함께 검토하고 승인 또는 거절하세요
+      </p>
 
       <div className="admin-approvals__tabs">
         {STATUS_TABS.map((tab) => (
