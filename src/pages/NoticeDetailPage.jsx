@@ -7,10 +7,16 @@ import {
 } from "../api/noticeAttachmentApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
+import NoticeComments from "../components/NoticeComments";
 import "./NoticeDetailPage.css";
 import "./AdminWritePage.css";
-import "./AssignmentDetailPage.css"; // 첨부파일 칩(.assignment-file-chip) 스타일 재사용
+import "./AssignmentDetailPage.css"; // 첨부파일 칩(.assignment-file-chip)·버튼(.assignment-btn) 스타일 재사용
 
+/**
+ * 공지사항 상세. GitHub PR #105(이슈 #104, "공지사항 댓글 기능 구현") 연동으로 댓글 섹션을
+ * 추가했다 — 제출물 댓글과 달리 공지는 전체 공개 게시물이라 로그인한 누구나(학생/관리자
+ * 구분 없이) 볼 수 있고 쓸 수 있어서, 조건 없이 항상 렌더링한다.
+ */
 function NoticeDetailPage() {
   const { noticeId } = useParams();
   const navigate = useNavigate();
@@ -150,6 +156,8 @@ function NoticeDetailPage() {
               </div>
             </div>
           )}
+
+          <NoticeComments noticeId={notice.noticeId} />
         </article>
       )}
     </AppLayout>

@@ -1,0 +1,194 @@
+/*
+ * 공지사항 댓글 섹션. NoticeDetailPage에서 사용.
+ * SubmissionComments.css와 거의 동일한 톤(파란 브랜드 컬러, 필 버튼)을 그대로 따른다 —
+ * 클래스 접두사만 notice-comment*로 분리해서 두 컴포넌트가 서로 스타일을 침범하지 않게 했다.
+ */
+
+.notice-comments {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.notice-comments__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 12px;
+}
+
+.notice-comments__state {
+  padding: 16px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13.5px;
+}
+
+.notice-comments__state--error {
+  color: #c23b3b;
+}
+
+.notice-comments__list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notice-comment {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.notice-comment__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.notice-comment__author {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1d1d1f;
+}
+
+.notice-comment__role {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.notice-comment__role.is-admin {
+  background: #eef2f8;
+  color: #002968;
+}
+
+.notice-comment__role.is-student {
+  background: #f0f0f0;
+  color: #7a7a7a;
+}
+
+.notice-comment__date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.notice-comment__text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #333333;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.notice-comment__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.notice-comment__action-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #7a7a7a;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.notice-comment__action-btn:hover:not(:disabled) {
+  color: #002968;
+  text-decoration: underline;
+}
+
+.notice-comment__action-btn--danger:hover:not(:disabled) {
+  color: #c23b3b;
+}
+
+.notice-comment__action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.notice-comment__edit {
+  margin-top: 4px;
+}
+
+.notice-comment__edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.notice-comments__more-btn {
+  display: block;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #333333;
+  border-radius: 8px;
+  padding: 9px 15px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 16px;
+}
+
+.notice-comments__more-btn:hover {
+  background: #f5f5f7;
+}
+
+.notice-comments__form {
+  margin-top: 4px;
+}
+
+.notice-comments__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 70px;
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.notice-comments__textarea:focus {
+  border-color: #002968;
+  box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
+}
+
+.notice-comments__textarea:disabled {
+  background: #f5f5f7;
+  cursor: not-allowed;
+}
+
+.notice-comments__form-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.notice-comments__counter {
+  font-size: 11.5px;
+  color: #9ca3af;
+}
