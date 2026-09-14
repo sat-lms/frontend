@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAllMembers, getMemberDetail, updateMemberRole } from "../api/adminMemberApi";
+import { getAllMembers, updateMemberRole } from "../api/adminMemberApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./AdminWritePage.css";
 import "./AdminApprovalsPage.css";
-import "./AdminSubmissionsPage.css"; // 상세 모달(.admin-submissions-modal__*) 스타일 재사용
 import "./AdminMembersPage.css";
 
 const PAGE_SIZE = 20;
@@ -31,14 +30,18 @@ const STATUS_LABEL = {
 };
 
 /**
- * 전체 회원 관리 화면 (관리자 전용). 명세서 11/12/13번 API 연동.
+ * 전체 회원 관리 화면 (관리자 전용). 명세서 11/12번 API 연동.
  * GET /api/v1/admin/members (역할/상태/검색어 필터 목록) +
- * GET /api/v1/admin/members/{memberId} (상세 - 심사 기록 포함, 모달로 표시) +
  * PATCH /api/v1/admin/members/{memberId}/role (역할 변경).
  *
- * 명세서 13번 자체가 "필수 요구사항 외 확장 API"로 명시돼 있어 화면도 최소한의 조작
- * (역할 토글 + 상세 확인)만 제공한다. 승인/거절은 이 화면이 아니라 회원가입 승인
- * 화면(AdminApprovalsPage, 명세서 8/9/10번)의 책임이라 여기서는 다루지 않는다.
+ * ⚠️ 팀 요청으로 두 가지를 제거했다:
+ * 1. "상세보기" 버튼/모달(명세서 13번, 심사 기록 조회) — 이 화면에서는 목록만 보여준다.
+ *    GET /api/v1/admin/members/{memberId}(getMemberDetail)는 adminMemberApi.js에 그대로
+ *    남아있으니 나중에 다시 필요해지면 재사용할 수 있다.
+ * 2. "관리자로 지정" 액션 — 학생을 관리자로 승격시키는 버튼은 더 이상 노출하지 않는다.
+ *    기존 관리자를 학생으로 되돌리는 "학생으로 변경"(강등)은 그대로 유지했다 — 요청이
+ *    "관리자로 지정 버튼 삭제"였지 강등까지 막아달라는 건 아니었기 때문. 이 화면으로
+ *    학생을 관리자로 만들 수 없으니, 그게 필요하면 다른 경로(DB 직접 조작 등)를 써야 한다.
  */
 function AdminMembersPage() {
   const { user: currentUser } = useAuth();
@@ -55,11 +58,6 @@ function AdminMembersPage() {
   const [error, setError] = useState("");
 
   const [changingRoleId, setChangingRoleId] = useState(null);
-
-  const [detailId, setDetailId] = useState(null);
-  const [detail, setDetail] = useState(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [detailError, setDetailError] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -105,45 +103,23 @@ function AdminMembersPage() {
     setPage(0);
   };
 
-  const handleToggleRole = async (member) => {
-    const nextRole = member.role === "ADMIN" ? "STUDENT" : "ADMIN";
+  // 관리자 → 학생 강등만 이 버튼으로 처리한다 (학생 → 관리자 승격 버튼은 제거됨).
+  const handleDemoteToStudent = async (member) => {
     const isSelf = currentUser?.id != null && String(currentUser.id) === String(member.memberId);
-
     const confirmMessage = isSelf
       ? "본인의 관리자 권한을 해제할까요? 이후 관리자 전용 화면에 접근할 수 없게 됩니다."
-      : `${member.name}님의 역할을 ${nextRole === "ADMIN" ? "관리자" : "학생"}(으)로 변경할까요?`;
+      : `${member.name}님의 역할을 학생으로 변경할까요?`;
     if (!window.confirm(confirmMessage)) return;
 
     setChangingRoleId(member.memberId);
     try {
-      await updateMemberRole(member.memberId, nextRole);
-      setMembers((prev) => prev.map((m) => (m.memberId === member.memberId ? { ...m, role: nextRole } : m)));
+      await updateMemberRole(member.memberId, "STUDENT");
+      setMembers((prev) => prev.map((m) => (m.memberId === member.memberId ? { ...m, role: "STUDENT" } : m)));
     } catch (err) {
       alert(err.message ?? "역할 변경에 실패했습니다.");
     } finally {
       setChangingRoleId(null);
     }
-  };
-
-  const openDetail = async (memberId) => {
-    setDetailId(memberId);
-    setDetail(null);
-    setDetailError("");
-    setDetailLoading(true);
-    try {
-      const data = await getMemberDetail(memberId);
-      setDetail(data);
-    } catch (err) {
-      setDetailError(err.message ?? "회원 정보를 불러오지 못했습니다.");
-    } finally {
-      setDetailLoading(false);
-    }
-  };
-
-  const closeDetail = () => {
-    setDetailId(null);
-    setDetail(null);
-    setDetailError("");
   };
 
   return (
@@ -216,21 +192,18 @@ function AdminMembersPage() {
                 </span>
                 <span className="admin-approvals-item__date">가입일 {formatDate(m.createdAt)}</span>
               </div>
-              <div className="admin-approvals-item__actions">
-                <button type="button" className="admin-detail-actions__btn" onClick={() => openDetail(m.memberId)}>
-                  상세보기
-                </button>
-                {m.status !== "WITHDRAWN" && (
+              {m.role === "ADMIN" && m.status !== "WITHDRAWN" && (
+                <div className="admin-approvals-item__actions">
                   <button
                     type="button"
                     className="admin-detail-actions__btn"
-                    onClick={() => handleToggleRole(m)}
+                    onClick={() => handleDemoteToStudent(m)}
                     disabled={changingRoleId === m.memberId}
                   >
-                    {changingRoleId === m.memberId ? "변경 중..." : m.role === "ADMIN" ? "학생으로 변경" : "관리자로 지정"}
+                    {changingRoleId === m.memberId ? "변경 중..." : "학생으로 변경"}
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -247,65 +220,6 @@ function AdminMembersPage() {
           <button disabled={page >= totalPages - 1} onClick={() => setPage((prev) => prev + 1)}>
             다음
           </button>
-        </div>
-      )}
-
-      {detailId && (
-        <div className="admin-submissions-modal__backdrop" onClick={closeDetail}>
-          <div className="admin-submissions-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="admin-submissions-modal__head">
-              <h2 className="admin-submissions-modal__title">
-                {detailLoading ? "불러오는 중..." : detail?.name ?? "회원 상세"}
-              </h2>
-              <button type="button" className="admin-submissions-modal__close" onClick={closeDetail} aria-label="닫기">
-                ×
-              </button>
-            </div>
-
-            {detailLoading && <p className="admin-approvals__state">불러오는 중...</p>}
-            {!detailLoading && detailError && (
-              <p className="admin-approvals__state admin-approvals__state--error">{detailError}</p>
-            )}
-
-            {!detailLoading && !detailError && detail && (
-              <div className="admin-members-detail">
-                <div className="admin-members-detail__row">
-                  <span>학번</span>
-                  <strong>{detail.studentNumber}</strong>
-                </div>
-                <div className="admin-members-detail__row">
-                  <span>역할</span>
-                  <strong>{detail.role === "ADMIN" ? "관리자" : "학생"}</strong>
-                </div>
-                <div className="admin-members-detail__row">
-                  <span>상태</span>
-                  <strong>{STATUS_LABEL[detail.status] ?? detail.status}</strong>
-                </div>
-                <div className="admin-members-detail__row">
-                  <span>가입일</span>
-                  <strong>{formatDate(detail.createdAt)}</strong>
-                </div>
-                {(detail.review?.action ?? detail.action) && (
-                  <>
-                    <div className="admin-members-detail__row">
-                      <span>심사 결과</span>
-                      <strong>{(detail.review?.action ?? detail.action) === "REJECTED" ? "거절" : "승인"}</strong>
-                    </div>
-                    {(detail.review?.rejectionReason ?? detail.rejectionReason) && (
-                      <div className="admin-members-detail__row">
-                        <span>거절 사유</span>
-                        <strong>{detail.review?.rejectionReason ?? detail.rejectionReason}</strong>
-                      </div>
-                    )}
-                    <div className="admin-members-detail__row">
-                      <span>처리일시</span>
-                      <strong>{formatDate(detail.review?.reviewedAt ?? detail.reviewedAt)}</strong>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
         </div>
       )}
     </AppLayout>
