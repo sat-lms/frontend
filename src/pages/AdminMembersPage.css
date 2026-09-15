@@ -29,15 +29,15 @@
 }
 
 .admin-members__badge--admin {
-  background: var(--tone-2-bg);
-  color: var(--tone-2-fg);
-  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
+  background: var(--tone-4-bg);
+  color: var(--tone-4-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-4-ring);
 }
 
 .admin-members__badge--student {
-  background: var(--tone-0-bg);
-  color: var(--tone-0-fg);
-  box-shadow: inset 0 0 0 1px var(--tone-0-ring);
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .admin-members__badge--status-pending {
