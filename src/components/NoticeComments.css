@@ -20,7 +20,7 @@
 .notice-comments__state {
   padding: 16px 0;
   text-align: center;
-  color: var(--tone-2-fg);
+  color: #9ca3af;
   font-size: 13.5px;
 }
 
@@ -70,18 +70,18 @@
 }
 
 .notice-comment__role.is-admin {
-  background: var(--tone-2-bg);
-  color: var(--tone-2-fg);
+  background: #eef2f8;
+  color: #002968;
 }
 
 .notice-comment__role.is-student {
-  background: var(--tone-1-bg);
+  background: #f0f0f0;
   color: #7a7a7a;
 }
 
 .notice-comment__date {
   font-size: 12px;
-  color: var(--tone-2-fg);
+  color: #9ca3af;
 }
 
 .notice-comment__text {
@@ -110,7 +110,7 @@
 }
 
 .notice-comment__action-btn:hover:not(:disabled) {
-  color: var(--tone-2-fg);
+  color: #002968;
   text-decoration: underline;
 }
 
@@ -171,7 +171,7 @@
 }
 
 .notice-comments__textarea:focus {
-  border-color: var(--tone-2-fg);
+  border-color: #002968;
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -190,5 +190,5 @@
 
 .notice-comments__counter {
   font-size: 11.5px;
-  color: var(--tone-2-fg);
+  color: #9ca3af;
 }

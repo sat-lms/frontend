@@ -27,7 +27,7 @@
 .admin-write-page__state {
   padding: 48px 0;
   text-align: center;
-  color: var(--tone-2-fg);
+  color: #9ca3af;
   font-size: 14px;
 }
 
@@ -74,7 +74,7 @@
 
 .admin-write-input:focus,
 .admin-write-textarea:focus {
-  border-color: var(--tone-2-fg);
+  border-color: #002968;
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -86,7 +86,7 @@
 
 .admin-write-hint {
   font-size: 12px;
-  color: var(--tone-2-fg);
+  color: #9ca3af;
   margin: 6px 0 0;
 }
 
@@ -103,13 +103,13 @@
 .admin-write-checkbox input {
   width: 16px;
   height: 16px;
-  accent-color: var(--tone-2-fg);
+  accent-color: #002968;
   cursor: pointer;
 }
 
 .admin-write-error {
   font-size: 12.5px;
-  color: var(--tone-2-fg);
+  color: var(--tone-4-fg);
   margin: 20px 0 0;
 }
 
@@ -212,7 +212,7 @@
 
 .admin-detail-actions__btn--danger {
   border-color: #f6c9cc;
-  color: var(--tone-2-fg);
+  color: var(--tone-4-fg);
 }
 
 .admin-detail-actions__btn--danger:hover {

@@ -16,7 +16,7 @@
 }
 
 .admin-members__status-select:focus {
-  border-color: var(--tone-2-fg);
+  border-color: #002968;
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -35,9 +35,9 @@
 }
 
 .admin-members__badge--student {
-  background: var(--tone-1-bg);
-  color: var(--tone-1-fg);
-  box-shadow: inset 0 0 0 1px var(--tone-1-ring);
+  background: var(--tone-0-bg);
+  color: var(--tone-0-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-0-ring);
 }
 
 .admin-members__badge--status-pending {
@@ -47,9 +47,9 @@
 }
 
 .admin-members__badge--status-approved {
-  background: var(--tone-2-bg);
-  color: var(--tone-2-fg);
-  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
+  background: var(--tone-0-bg);
+  color: var(--tone-0-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-0-ring);
 }
 
 .admin-members__badge--status-rejected {
@@ -59,9 +59,9 @@
 }
 
 .admin-members__badge--status-withdrawn {
-  background: var(--tone-1-bg);
-  color: var(--tone-1-fg);
-  box-shadow: inset 0 0 0 1px var(--tone-1-ring);
+  background: var(--tone-0-bg);
+  color: var(--tone-0-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-0-ring);
 }
 
 .admin-members-detail {
