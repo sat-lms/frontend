@@ -28,19 +28,19 @@
 
 .admin-approvals__tab.is-active {
   background: #002968;
-  border-color: #002968;
+  border-color: var(--tone-2-fg);
   color: #ffffff;
 }
 
 .admin-approvals__state {
   padding: 48px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 14px;
 }
 
 .admin-approvals__state--error {
-  color: #c23b3b;
+  color: var(--tone-2-fg);
 }
 
 .admin-approvals-list {
@@ -84,7 +84,7 @@
 
 .admin-approvals-item__date {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
 }
 
 .admin-approvals-item__actions {
@@ -102,13 +102,15 @@
 }
 
 .admin-approvals-item__status.is-approved {
-  background: #e7f7ee;
-  color: #1f9254;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .admin-approvals-item__status.is-rejected {
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-5-bg);
+  color: var(--tone-5-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-5-ring);
 }
 
 .admin-approvals__pagination {

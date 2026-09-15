@@ -22,12 +22,12 @@
 .assignment-detail-page__state {
   padding: 48px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 14px;
 }
 
 .assignment-detail-page__state--error {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .assignment-detail {
@@ -69,23 +69,27 @@
 }
 
 .assignment-status-badge.is-progress {
-  background: #eef2f8;
-  color: #002968;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .assignment-status-badge.is-submitted {
-  background: #e7f7ee;
-  color: #1f9254;
+  background: var(--tone-3-bg);
+  color: var(--tone-3-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-3-ring);
 }
 
 .assignment-status-badge.is-late {
-  background: #fff3e0;
-  color: #c97a1d;
+  background: var(--tone-4-bg);
+  color: var(--tone-4-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-4-ring);
 }
 
 .assignment-status-badge.is-closed {
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-5-bg);
+  color: var(--tone-5-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-5-ring);
 }
 
 .assignment-detail__due {
@@ -148,7 +152,7 @@
 }
 
 .assignment-file-chip__size {
-  color: #9ca3af;
+  color: var(--tone-2-fg);
 }
 
 button.assignment-file-chip__name {
@@ -168,14 +172,14 @@ button.assignment-file-chip__name {
   border-radius: 6px;
   font-size: 15px;
   line-height: 1;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   cursor: pointer;
   font-family: inherit;
 }
 
 .assignment-file-chip__remove:hover:not(:disabled) {
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
 }
 
 .assignment-file-chip__remove:disabled {
@@ -205,11 +209,11 @@ button.assignment-file-chip__name {
 }
 
 .assignment-receipt__label.is-submitted {
-  color: #1f9254;
+  color: var(--tone-3-fg);
 }
 
 .assignment-receipt__label.is-late {
-  color: #c97a1d;
+  color: var(--tone-4-fg);
 }
 
 .assignment-receipt__actions {
@@ -252,7 +256,7 @@ button.assignment-file-chip__name {
 }
 
 .assignment-form__textarea:focus {
-  border-color: #002968;
+  border-color: var(--tone-2-fg);
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -292,12 +296,12 @@ button.assignment-file-chip__name {
 
 .assignment-form__file-input-hint {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
 }
 
 .assignment-form__error {
   font-size: 12.5px;
-  color: #c23b3b;
+  color: var(--tone-4-fg);
   margin: 12px 0 0;
 }
 
@@ -348,13 +352,13 @@ button.assignment-file-chip__name {
 .assignment-btn--danger {
   border: 1px solid #f6c9cc;
   background: #ffffff;
-  color: #c23b3b;
+  color: var(--tone-4-fg);
   font-size: 14px;
   padding: 9px 15px;
 }
 
 .assignment-btn--danger:hover:not(:disabled) {
-  background: #fdebec;
+  background: var(--tone-2-bg);
 }
 
 .assignment-form__hint {
@@ -366,8 +370,8 @@ button.assignment-file-chip__name {
 
 .assignment-closed-banner {
   margin-top: 24px;
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-4-bg);
+  color: var(--tone-4-fg);
   font-size: 13.5px;
   font-weight: 600;
   padding: 16px 18px;

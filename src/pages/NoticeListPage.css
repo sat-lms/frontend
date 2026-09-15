@@ -35,12 +35,12 @@
 .notice-page__state {
   padding: 48px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 14px;
 }
 
 .notice-page__state--error {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .notice-list {
@@ -76,10 +76,11 @@
   flex-shrink: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #c97a1d;
-  background: #fff3e0;
+  color: var(--tone-2-fg);
+  background: var(--tone-2-bg);
   border-radius: 9999px;
   padding: 3px 10px;
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .notice-item__dot {
@@ -87,7 +88,7 @@
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #c23b3b;
+  background: var(--tone-5-bg);
 }
 
 .notice-item__title {

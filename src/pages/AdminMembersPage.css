@@ -16,7 +16,7 @@
 }
 
 .admin-members__status-select:focus {
-  border-color: #002968;
+  border-color: var(--tone-2-fg);
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -29,33 +29,39 @@
 }
 
 .admin-members__badge--admin {
-  background: #eef2f8;
-  color: #002968;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .admin-members__badge--student {
-  background: #f0f0f0;
-  color: #555555;
+  background: var(--tone-1-bg);
+  color: var(--tone-1-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-1-ring);
 }
 
 .admin-members__badge--status-pending {
-  background: #fff3e0;
-  color: #c97a1d;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .admin-members__badge--status-approved {
-  background: #e7f7ee;
-  color: #1f9254;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .admin-members__badge--status-rejected {
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-5-bg);
+  color: var(--tone-5-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-5-ring);
 }
 
 .admin-members__badge--status-withdrawn {
-  background: #f0f0f0;
-  color: #9ca3af;
+  background: var(--tone-1-bg);
+  color: var(--tone-1-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-1-ring);
 }
 
 .admin-members-detail {

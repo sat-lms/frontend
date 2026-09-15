@@ -19,12 +19,12 @@
 .submission-comments__state {
   padding: 16px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 13.5px;
 }
 
 .submission-comments__state--error {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .submission-comments__list {
@@ -69,18 +69,18 @@
 }
 
 .submission-comment__role.is-admin {
-  background: #eef2f8;
-  color: #002968;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
 }
 
 .submission-comment__role.is-student {
-  background: #f0f0f0;
+  background: var(--tone-1-bg);
   color: #7a7a7a;
 }
 
 .submission-comment__date {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
 }
 
 .submission-comment__text {
@@ -109,12 +109,12 @@
 }
 
 .submission-comment__action-btn:hover:not(:disabled) {
-  color: #002968;
+  color: var(--tone-2-fg);
   text-decoration: underline;
 }
 
 .submission-comment__action-btn--danger:hover:not(:disabled) {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .submission-comment__action-btn:disabled {
@@ -170,7 +170,7 @@
 }
 
 .submission-comments__textarea:focus {
-  border-color: #002968;
+  border-color: var(--tone-2-fg);
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
@@ -189,5 +189,5 @@
 
 .submission-comments__counter {
   font-size: 11.5px;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
 }

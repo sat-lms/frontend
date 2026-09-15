@@ -22,12 +22,12 @@
 .notice-detail-page__state {
   padding: 48px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 14px;
 }
 
 .notice-detail-page__state--error {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .notice-detail {
@@ -46,11 +46,12 @@
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
-  color: #c97a1d;
-  background: #fff3e0;
+  color: var(--tone-2-fg);
+  background: var(--tone-2-bg);
   border-radius: 9999px;
   padding: 3px 10px;
   margin-bottom: 10px;
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .notice-detail__title {

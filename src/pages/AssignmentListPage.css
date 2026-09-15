@@ -25,12 +25,12 @@
 .assignment-page__state {
   padding: 48px 0;
   text-align: center;
-  color: #9ca3af;
+  color: var(--tone-2-fg);
   font-size: 14px;
 }
 
 .assignment-page__state--error {
-  color: #c23b3b;
+  color: var(--tone-4-fg);
 }
 
 .assignment-list {
@@ -91,28 +91,33 @@
 }
 
 .assignment-item__status.is-progress {
-  background: #eef2f8;
-  color: #002968;
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .assignment-item__status.is-submitted {
-  background: #e7f7ee;
-  color: #1f9254;
+  background: var(--tone-3-bg);
+  color: var(--tone-3-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-3-ring);
 }
 
 .assignment-item__status.is-late {
-  background: #fff3e0;
-  color: #c97a1d;
+  background: var(--tone-4-bg);
+  color: var(--tone-4-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-4-ring);
 }
 
 .assignment-item__status.is-closed {
-  background: #fdebec;
-  color: #c23b3b;
+  background: var(--tone-5-bg);
+  color: var(--tone-5-fg);
+  box-shadow: inset 0 0 0 1px var(--tone-5-ring);
 }
 
 .assignment-item__status.is-default {
-  background: #f0f0f0;
+  background: var(--tone-2-bg);
   color: #7a7a7a;
+  box-shadow: inset 0 0 0 1px var(--tone-2-ring);
 }
 
 .assignment-page__pagination {
