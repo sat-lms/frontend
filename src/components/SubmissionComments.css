@@ -114,7 +114,7 @@
 }
 
 .submission-comment__action-btn--danger:hover:not(:disabled) {
-  color: var(--tone-4-fg);
+  color: var(--danger-fg);
 }
 
 .submission-comment__action-btn:disabled {

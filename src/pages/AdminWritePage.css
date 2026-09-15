@@ -211,10 +211,10 @@
 }
 
 .admin-detail-actions__btn--danger {
-  border-color: #f6c9cc;
-  color: var(--tone-4-fg);
+  border-color: var(--danger-border);
+  color: var(--danger-fg);
 }
 
 .admin-detail-actions__btn--danger:hover {
-  background: var(--tone-2-bg);
+  background: var(--danger-bg-hover);
 }

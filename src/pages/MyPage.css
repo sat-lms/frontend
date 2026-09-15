@@ -55,11 +55,11 @@
 }
 
 .mypage-withdraw-btn {
-  border: 1px solid #f6c9cc;
+  border: 1px solid var(--danger-border);
   background: #ffffff;
-  color: var(--tone-2-fg);
+  color: var(--danger-fg);
 }
 
 .mypage-withdraw-btn:hover:not(:disabled) {
-  background: var(--tone-2-bg);
+  background: var(--danger-bg-hover);
 }

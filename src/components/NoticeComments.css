@@ -115,7 +115,7 @@
 }
 
 .notice-comment__action-btn--danger:hover:not(:disabled) {
-  color: var(--tone-4-fg);
+  color: var(--danger-fg);
 }
 
 .notice-comment__action-btn:disabled {
