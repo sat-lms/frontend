@@ -7,6 +7,7 @@ import {
   NOTICE_COMMENT_MAX_LENGTH,
 } from "../api/noticeCommentApi";
 import { useAuth } from "../context/AuthContext";
+import { isMyComment } from "../utils/commentOwnership";
 import "./NoticeComments.css";
 
 const PAGE_SIZE = 20;
@@ -17,9 +18,9 @@ const PAGE_SIZE = 20;
  * 로그인한 누구나(학생/관리자 구분 없이) 댓글을 읽고 쓸 수 있다. 그래서 이 컴포넌트에는
  * "제출 완료 후에만 보인다" 같은 조건이 없다 — 공지 상세 화면이면 항상 노출한다.
  *
- * ⚠️ 백엔드 응답에 authorId가 없어서 "내 댓글인지"는 이름 문자열 비교로만 판단한다
- * (동명이인이면 서로 헷갈릴 수 있음 — SubmissionComments와 동일한 한계, noticeCommentApi.js
- * 상단 주석 참고).
+ * 내 댓글 판별은 utils/commentOwnership.isMyComment 사용 — authorId → authorStudentNumber →
+ * authorName 순으로 비교한다. 현재 백엔드 응답에는 authorName만 있어 이름 폴백이 동작하므로
+ * 동명이인 오판 가능성이 있다. 백엔드가 authorId(또는 authorStudentNumber)를 추가하면 자동 해결.
  */
 function NoticeComments({ noticeId }) {
   const { user } = useAuth();
@@ -148,7 +149,7 @@ function NoticeComments({ noticeId }) {
       {comments.length > 0 && (
         <ul className="notice-comments__list">
           {comments.map((comment) => {
-            const isMine = comment.authorName === user?.name;
+            const isMine = isMyComment(comment, user);
             const canEdit = isMine;
             const canDelete = isMine || isAdmin;
             const isEditing = editingId === comment.commentId;

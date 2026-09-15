@@ -7,6 +7,7 @@ import {
   SUBMISSION_COMMENT_MAX_LENGTH,
 } from "../api/submissionCommentApi";
 import { useAuth } from "../context/AuthContext";
+import { isMyComment } from "../utils/commentOwnership";
 import "./SubmissionComments.css";
 
 const PAGE_SIZE = 20;
@@ -16,9 +17,9 @@ const PAGE_SIZE = 20;
  * 학생 제출 상세(AssignmentDetailPage, 제출 완료 후에만)와 관리자 제출물 상세 모달
  * (AdminSubmissionsPage) 양쪽에서 재사용한다.
  *
- * ⚠️ 백엔드 응답에 authorId가 없어서, "이 댓글이 내 것인지"는 이름 문자열 비교로만 판단한다
- * (동명이인이면 서로 헷갈릴 수 있음 — submissionCommentApi.js 상단 주석 참고).
- * 수정은 작성자 본인만, 삭제는 작성자 본인 또는 관리자만 가능하도록 버튼을 조건부로 보여주되,
+ * 내 댓글 판별은 utils/commentOwnership.isMyComment 사용 — authorId → authorStudentNumber →
+ * authorName 순으로 비교한다. 현재 백엔드 응답에는 authorName만 있어 이름 폴백이 동작하므로
+ * 동명이인 오판 가능성이 있다. 백엔드가 authorId(또는 authorStudentNumber)를 추가하면 자동 해결.
  * 실제 권한 검사는 어차피 백엔드가 401/403으로 최종 확인한다.
  */
 function SubmissionComments({ submissionId }) {
@@ -152,7 +153,7 @@ function SubmissionComments({ submissionId }) {
       {comments.length > 0 && (
         <ul className="submission-comments__list">
           {comments.map((comment) => {
-            const isMine = comment.authorName === user?.name;
+            const isMine = isMyComment(comment, user);
             const canEdit = isMine;
             const canDelete = isMine || isAdmin;
             const isEditing = editingId === comment.commentId;

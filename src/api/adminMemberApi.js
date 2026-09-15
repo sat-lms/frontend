@@ -34,6 +34,7 @@ export const reviewMemberApplication = async (memberId, { action, rejectionReaso
  * 전체 회원 목록 조회 (관리자 전용)
  * GET /api/v1/admin/members
  * role/status/keyword는 모두 선택 필터이며, 넘기지 않으면 조건 없이 전체를 조회한다.
+ * sort는 Spring Pageable 형식 문자열("createdAt,desc" 등).
  * @param {{ role?: "STUDENT" | "ADMIN", status?: "PENDING" | "APPROVED" | "REJECTED" | "WITHDRAWN", keyword?: string, sort?: string, page?: number, size?: number }} params
  * @returns {Promise<{ content: Array<{ memberId: number, studentNumber: string, name: string, role: string, status: string, createdAt: string }>, totalPages: number, totalElements: number }>}
  */
@@ -65,4 +66,16 @@ export const getMemberDetail = async (memberId) => {
 export const updateMemberRole = async (memberId, role) => {
   const { data } = await axiosInstance.patch(`/api/v1/admin/members/${memberId}/role`, { role });
   return data;
+};
+
+/**
+ * 회원 추방 (강제 탈퇴, 관리자 전용)
+ * DELETE /api/v1/admin/members/{memberId}
+ * 물리 삭제가 아닌 소프트 삭제 — 상태만 WITHDRAWN으로 변경되고 연관 데이터는 보존된다.
+ * 백엔드에서 APPROVED 상태의 STUDENT만 대상으로 허용하며, 자기 자신 및 다른 ADMIN은 차단한다.
+ * @param {number|string} memberId
+ * @returns {Promise<void>}
+ */
+export const expelMember = async (memberId) => {
+  await axiosInstance.delete(`/api/v1/admin/members/${memberId}`);
 };
