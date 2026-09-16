@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAllMembers, updateMemberRole, expelMember } from "../api/adminMemberApi";
+import { getAllMembers, expelMember } from "../api/adminMemberApi";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/AppLayout";
 import "./AdminWritePage.css";
@@ -57,17 +57,16 @@ const STATUS_LABEL = {
 /**
  * 전체 회원 관리 화면 (관리자 전용). 명세서 11/12번 API 연동.
  * GET /api/v1/admin/members (역할/상태/검색어 필터 + 정렬 목록) +
- * PATCH /api/v1/admin/members/{memberId}/role (역할 변경) +
  * DELETE /api/v1/admin/members/{memberId} (승인된 학생 추방, 소프트 삭제).
+ * 역할 변경(승격·강등)은 보안상 이 화면에서 제공하지 않는다. 로그인한 본인은 목록에서 숨긴다.
  *
- * ⚠️ 팀 요청으로 두 가지를 제거했다:
+ * ⚠️ 팀 요청으로 제거한 것들:
  * 1. "상세보기" 버튼/모달(명세서 13번, 심사 기록 조회) — 이 화면에서는 목록만 보여준다.
  *    GET /api/v1/admin/members/{memberId}(getMemberDetail)는 adminMemberApi.js에 그대로
  *    남아있으니 나중에 다시 필요해지면 재사용할 수 있다.
- * 2. "관리자로 지정" 액션 — 학생을 관리자로 승격시키는 버튼은 더 이상 노출하지 않는다.
- *    기존 관리자를 학생으로 되돌리는 "학생으로 변경"(강등)은 그대로 유지했다 — 요청이
- *    "관리자로 지정 버튼 삭제"였지 강등까지 막아달라는 건 아니었기 때문. 이 화면으로
- *    학생을 관리자로 만들 수 없으니, 그게 필요하면 다른 경로(DB 직접 조작 등)를 써야 한다.
+ * 2. 역할 변경 버튼 전부 — "관리자로 지정"(승격)과 "학생으로 변경"(강등) 모두 노출하지
+ *    않는다. 역할 변경이 필요하면 다른 경로(DB 직접 조작 등)를 써야 한다.
+ * 3. 로그인한 관리자 본인 행 — 자기 자신에게 할 수 있는 동작이 없으므로 목록에서 숨긴다.
  */
 function AdminMembersPage() {
   const { user: currentUser } = useAuth();
@@ -84,7 +83,6 @@ function AdminMembersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [changingRoleId, setChangingRoleId] = useState(null);
   const [expellingId, setExpellingId] = useState(null);
 
   useEffect(() => {
@@ -107,7 +105,10 @@ function AdminMembersPage() {
         page,
         size: PAGE_SIZE,
       });
-      const list = Array.isArray(data) ? data : data.content ?? [];
+      const raw = Array.isArray(data) ? data : data.content ?? [];
+      // 로그인한 관리자 본인은 목록에서 숨긴다 (자기 자신에게 할 수 있는 관리 동작이 없음).
+      const list =
+        currentUser?.id != null ? raw.filter((m) => String(m.memberId) !== String(currentUser.id)) : raw;
       setMembers(sortMembers(list, sort));
       setTotalPages(Array.isArray(data) ? 1 : data.totalPages ?? 1);
     } catch (err) {
@@ -115,7 +116,7 @@ function AdminMembersPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [role, status, keyword, sort, page]);
+  }, [role, status, keyword, sort, page, currentUser?.id]);
 
   useEffect(() => {
     fetchMembers();
@@ -135,25 +136,6 @@ function AdminMembersPage() {
   const handleChangeSort = (e) => {
     setSort(e.target.value);
     setPage(0);
-  };
-
-  // 관리자 → 학생 강등만 이 버튼으로 처리한다 (학생 → 관리자 승격 버튼은 제거됨).
-  const handleDemoteToStudent = async (member) => {
-    const isSelf = currentUser?.id != null && String(currentUser.id) === String(member.memberId);
-    const confirmMessage = isSelf
-      ? "본인의 관리자 권한을 해제할까요? 이후 관리자 전용 화면에 접근할 수 없게 됩니다."
-      : `${member.name}님의 역할을 학생으로 변경할까요?`;
-    if (!window.confirm(confirmMessage)) return;
-
-    setChangingRoleId(member.memberId);
-    try {
-      await updateMemberRole(member.memberId, "STUDENT");
-      setMembers((prev) => prev.map((m) => (m.memberId === member.memberId ? { ...m, role: "STUDENT" } : m)));
-    } catch (err) {
-      alert(err.message ?? "역할 변경에 실패했습니다.");
-    } finally {
-      setChangingRoleId(null);
-    }
   };
 
   // 승인된 학생 추방(강제 탈퇴). 백엔드가 자기 자신/다른 ADMIN 추방을 거부하지만,
@@ -252,18 +234,6 @@ function AdminMembersPage() {
                 </span>
                 <span className="admin-approvals-item__date">가입일 {formatDate(m.createdAt)}</span>
               </div>
-              {m.role === "ADMIN" && m.status !== "WITHDRAWN" && (
-                <div className="admin-approvals-item__actions">
-                  <button
-                    type="button"
-                    className="admin-detail-actions__btn"
-                    onClick={() => handleDemoteToStudent(m)}
-                    disabled={changingRoleId === m.memberId}
-                  >
-                    {changingRoleId === m.memberId ? "변경 중..." : "학생으로 변경"}
-                  </button>
-                </div>
-              )}
               {m.role === "STUDENT" && m.status === "APPROVED" && (
                 <div className="admin-approvals-item__actions">
                   <button
