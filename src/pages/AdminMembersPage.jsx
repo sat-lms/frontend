@@ -226,7 +226,7 @@ function AdminMembersPage() {
         <ul className="admin-approvals-list">
           {members.map((m) => (
             <li key={m.memberId} className="admin-approvals-item">
-              <div className="admin-approvals-item__main">
+              <div className="admin-approvals-item__main admin-members__row">
                 <span className="admin-approvals-item__name">{m.name}</span>
                 <span className="admin-approvals-item__number">{m.studentNumber}</span>
                 <span
