@@ -20,6 +20,46 @@
   box-shadow: 0 0 0 3px rgba(0, 41, 104, 0.12);
 }
 
+/* 정렬 토글 (가입순 / 오름차순 / 내림차순) — 상태 셀렉트와 같은 높이의 알약형 버튼 그룹 */
+.admin-members__sort {
+  display: inline-flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 9999px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.admin-members__sort-btn {
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.admin-members__sort-btn + .admin-members__sort-btn {
+  border-left: 1px solid #e0e0e0;
+}
+
+.admin-members__sort-btn:hover {
+  background: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.admin-members__sort-btn.is-active {
+  background: var(--tone-2-bg);
+  color: var(--tone-2-fg);
+  font-weight: 600;
+}
+
+.admin-members__sort-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(0, 41, 104, 0.25);
+}
+
 .admin-members__badge {
   flex-shrink: 0;
   font-size: 12.5px;

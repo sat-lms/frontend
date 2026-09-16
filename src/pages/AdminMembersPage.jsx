@@ -23,11 +23,11 @@ const STATUS_OPTIONS = [
 ];
 
 // 정렬 옵션. value는 Spring Pageable 형식(`sort=필드,방향`)으로 백엔드에 그대로 전달한다.
+// 가입순 = 최근 가입한 사람이 위로, 오름/내림차순 = 학번 기준.
 const SORT_OPTIONS = [
-  { value: "createdAt,desc", label: "가입일 최신순" },
-  { value: "createdAt,asc", label: "가입일 오래된순" },
-  { value: "studentNumber,asc", label: "학번 오름차순" },
-  { value: "studentNumber,desc", label: "학번 내림차순" },
+  { value: "createdAt,desc", label: "가입순" },
+  { value: "studentNumber,asc", label: "오름차순" },
+  { value: "studentNumber,desc", label: "내림차순" },
 ];
 const DEFAULT_SORT = SORT_OPTIONS[0].value;
 
@@ -133,8 +133,9 @@ function AdminMembersPage() {
     setPage(0);
   };
 
-  const handleChangeSort = (e) => {
-    setSort(e.target.value);
+  const handleChangeSort = (value) => {
+    if (value === sort) return;
+    setSort(value);
     setPage(0);
   };
 
@@ -185,13 +186,19 @@ function AdminMembersPage() {
             </option>
           ))}
         </select>
-        <select className="admin-members__status-select" value={sort} onChange={handleChangeSort} aria-label="정렬">
+        <div className="admin-members__sort" role="group" aria-label="정렬">
           {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
+            <button
+              key={opt.value}
+              type="button"
+              className={`admin-members__sort-btn${sort === opt.value ? " is-active" : ""}`}
+              onClick={() => handleChangeSort(opt.value)}
+              aria-pressed={sort === opt.value}
+            >
               {opt.label}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
         <div className="list-search" style={{ marginLeft: "auto" }}>
           <span className="list-search__icon" aria-hidden="true">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
