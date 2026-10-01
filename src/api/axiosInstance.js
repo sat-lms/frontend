@@ -1,12 +1,10 @@
 import axios from "axios";
 
-// 프로덕션(Vercel) 빌드에서는 baseURL을 비워서 상대경로("/api/v1/...")로 요청한다.
-// vercel.json의 rewrites가 "/api/:path*"를 백엔드(https://satlms.cloud)로 서버 사이드 프록시하므로
-// 브라우저는 같은 오리진(satlms.vercel.app)으로만 요청 → 백엔드 CORS 설정 없이 동작한다.
-// 로컬 개발(npm run dev)에서는 프록시가 없으므로 .env의 VITE_API_BASE_URL로 백엔드를 직접 호출한다.
-const BASE_URL = import.meta.env.PROD
-  ? ""
-  : import.meta.env.VITE_API_BASE_URL ?? "https://satlms.cloud";
+// 항상 같은 오리진의 상대경로("/api/v1/...")로 요청한다.
+// - 프로덕션(Vercel): vercel.json rewrites가 "/api/:path*"를 https://api.satlms.cloud 로 서버 사이드 프록시
+// - 로컬 개발(npm run dev): vite.config.js의 server.proxy가 "/api"를 https://api.satlms.cloud 로 프록시
+// 브라우저 입장에서는 항상 같은 오리진이라 CORS 설정 없이 동작한다.
+const BASE_URL = "";
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

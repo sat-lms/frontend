@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://satlms.cloud/api/:path*"
+      "destination": "https://api.satlms.cloud/api/:path*"
     },
     {
       "source": "/(.*)",
