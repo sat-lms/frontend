@@ -30,6 +30,28 @@ export const reviewMemberApplication = async (memberId, { action, rejectionReaso
   return data;
 };
 
+/** 일괄 승인 한 요청당 최대 회원 수 (백엔드 @Size(max = 100)) */
+export const BULK_APPROVE_MAX = 100;
+
+/**
+ * 가입 신청 일괄 승인 (APPROVED ADMIN 전용)
+ * POST /api/v1/admin/member-applications/bulk-approve
+ * - 학번이 아닌 회원 ID(memberId)를 보낸다. 1~100개, 중복은 서버에서 한 번만 처리.
+ * - 요청 전체가 하나의 트랜잭션: 오류(409/500 등) 시 아무도 승인되지 않고 전체 rollback.
+ * - 전원 제외돼도 200/success=true이므로 결과는 반드시 approvedCount/skippedCount로 판단한다.
+ * @param {number[]} memberIds
+ * @returns {Promise<{
+ *   requestedCount: number, approvedCount: number, skippedCount: number,
+ *   results: Array<{ memberId: number, result: "APPROVED" | "SKIPPED", reason: "NOT_PENDING" | "NOT_FOUND" | null }>
+ * }>}
+ */
+export const bulkApproveMemberApplications = async (memberIds) => {
+  const { data } = await axiosInstance.post("/api/v1/admin/member-applications/bulk-approve", {
+    memberIds,
+  });
+  return data;
+};
+
 /**
  * 전체 회원 목록 조회 (관리자 전용)
  * GET /api/v1/admin/members
