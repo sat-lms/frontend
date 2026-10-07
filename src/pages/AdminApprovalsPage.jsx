@@ -238,7 +238,7 @@ function AdminApprovalsPage() {
             onClick={handleBulkApprove}
             disabled={selectedCount === 0 || isBusy}
           >
-            {isBulkProcessing ? "승인 처리 중..." : "선택 승인"}
+            {isBulkProcessing ? "승인 처리 중..." : "일괄 승인"}
           </button>
         </div>
       )}
